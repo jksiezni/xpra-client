@@ -1,0 +1,6 @@
+[submodule "bee-encode"]
+	path = bee-encode
+	url = https://github.com/jksiezni/bee-encode.git
+[submodule "rencode4j"]
+	path = rencode4j
+	url = https://github.com/jksiezni/rencode4j.git

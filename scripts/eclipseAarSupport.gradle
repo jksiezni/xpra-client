@@ -1,0 +1,50 @@
+import java.io.File;
+
+task copyAarDependencies(type: Copy) {
+	description = 'Used for Eclipse. Copies all dependencies to the libs directory. If there are any AAR files it will extract the classes.jar and rename it the same as the AAR file but with a .jar on the end.'
+	
+	println 'Extracting dependencies from compile configuration'
+	configurations.compile.filter {it.name.endsWith 'aar'}.each { File file -> moveAndRenameAar(file) }
+	println 'Extracting dependencies from releaseCompile configuration'
+	configurations.releaseCompile.filter {it.name.endsWith 'aar'}.each { File file -> moveAndRenameAar(file) }
+	println 'Extracting dependencies from debugCompile configuration'
+	configurations.debugCompile.filter {it.name.endsWith 'aar'}.each { File file -> moveAndRenameAar(file) }
+	println 'Extracting AAR dependencies from instrumentTestCompile configuration'
+	configurations.androidTestCompile.filter {it.name.endsWith 'aar'}.each { File file -> moveAndRenameAar(file) }
+}
+
+
+void moveAndRenameAar(File file) {
+	def baseFilename = file.name.lastIndexOf('.').with {it != -1 ? file.name[0..<it] : file.name}
+	def baseAarDir = new File("${project.projectDir}/libs/"+baseFilename)
+	
+	if(baseAarDir.exists()) {
+		println 'Aar already deployed: ' + baseAarDir
+		return
+	}
+
+	println 'Deploying aar: ' + baseAarDir
+	// directory excluding the classes.jar
+	copy{
+			from zipTree(file)
+			exclude 'classes.jar'
+			into 'libs/'+baseFilename
+	}
+
+	// Copies the classes.jar into the libs directory of the expoded AAR.
+	// In Eclipse you can then import this exploded ar as an Android project
+	// and then reference not only the classes but also the android resources :D
+	copy{
+			from zipTree(file)
+			include 'classes.jar'
+			into 'libs/' + baseFilename +'/libs'
+			rename { String fileName ->
+					fileName.replace('classes.jar', baseFilename + '.jar')
+			}
+	}
+	
+	def properitesFile = new File("${project.projectDir}/libs/$baseFilename/project.properties")
+	properitesFile.createNewFile()
+	properitesFile.text = "target=android-21\n"
+	properitesFile.text += "android.library=true"
+}
