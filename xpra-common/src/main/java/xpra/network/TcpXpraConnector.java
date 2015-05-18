@@ -27,7 +27,7 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 	
 	private Thread thread;
 	
-	public TcpXpraConnector(String hostname, int port, XpraClient client) {
+	public TcpXpraConnector(XpraClient client, String hostname, int port) {
 		super(client);
 		this.host = hostname;
 		this.port = port;

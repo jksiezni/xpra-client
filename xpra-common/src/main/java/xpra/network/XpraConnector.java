@@ -21,7 +21,10 @@ public abstract class XpraConnector {
 	
 	public abstract void disconnect();
 	
+	public abstract boolean isRunning();
+	
 	public XpraClient getClient() {
 		return client;
 	}
+
 }

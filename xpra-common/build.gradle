@@ -7,6 +7,7 @@ dependencies {
     compile project(':rencode4j')
 		
 		compile 'org.slf4j:slf4j-api:1.7.+'
+		compile 'com.jcraft:jsch:0.1.52'
 		//compile 'com.github.jksiezni:rencode4j:1.2.+'
 		
     testCompile 'junit:junit:4.+'
