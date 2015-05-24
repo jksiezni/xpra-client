@@ -40,11 +40,16 @@ public abstract class XpraClient {
 	private PictureEncoding encoding;
 	private int desktopWidth;
 	private int desktopHeight;
+	private int dpi = 96;
+	private int xdpi;
+	private int ydpi;
 	private int compressionLevel = 0;
 	
 	private XpraKeyboard keyboard;
 	
 	private XpraSender sender;
+	
+	private boolean disconnectedByServer;
 
 	public XpraClient(int desktopWidth, int desktopHeight, PictureEncoding[] supportedPictureEncodings, XpraKeyboard keyboard) {
 		this.desktopWidth = desktopWidth;
@@ -59,7 +64,8 @@ public abstract class XpraClient {
 		setHandler(new PacketHandler<Disconnect>(Disconnect.class) {
 			@Override
 			protected void process(Disconnect response) throws IOException {
-				System.err.println("Server disconnected with msg: " + response.reason);
+				logger.debug("Server disconnected with msg: %s", response.reason);
+				disconnectedByServer = true;
 			}
 		});
 		setHandler(new PacketHandler<NewWindow>(NewWindow.class) {
@@ -123,11 +129,25 @@ public abstract class XpraClient {
 		handlers.put(handler.getType(), handler);
 	}
 	
+	/**
+	 * The DPI should be set before connecting to Server. 
+	 * @param dpi
+	 * @param xdpi
+	 * @param ydpi
+	 */
+	protected void setDpi(int dpi, int xdpi, int ydpi) {
+		this.dpi = dpi;
+		this.xdpi = xdpi;
+		this.ydpi = ydpi;
+	}
+	
 	protected abstract XpraWindow createWindow(NewWindow wnd);
 
 	public void onConnect(XpraSender sender) {
 		this.sender = sender;
-		sender.send(new HelloRequest(desktopWidth, desktopHeight, keyboard, encoding, pictureEncodings));
+		final HelloRequest hello = new HelloRequest(desktopWidth, desktopHeight, keyboard, encoding, pictureEncodings);
+		hello.setDpi(dpi, xdpi, ydpi);
+		sender.send(hello);
 	}
 	
 	public void onDisconnect() {
@@ -140,14 +160,6 @@ public abstract class XpraClient {
 		logger.error("connection error", e);
 	}
 	
-	public XpraSender getSender() {
-		return sender;
-	}
-	
-	public XpraWindow getWindow(int windowId) {
-		return windows.get(windowId);
-	}
-
 	public final void onPacketReceived(List<Object> packetList) throws IOException {
 		if (packetList.size() < 1) {
 			logger.error("processPacket(..) decoded data is too small: " + packetList);
@@ -168,6 +180,24 @@ public abstract class XpraClient {
 			System.exit(1);
 		}
 	}
+
+	public XpraSender getSender() {
+		return sender;
+	}
+	
+	public XpraWindow getWindow(int windowId) {
+		return windows.get(windowId);
+	}
+	
+	public void setDesktopSize(int width, int height) {
+		this.desktopWidth = width;
+		this.desktopHeight = height;
+	}
+	
+	public boolean isDisconnectedByServer() {
+		return disconnectedByServer;
+	}
+
 	
 	private class HelloHandler extends PacketHandler<HelloResponse> {
 

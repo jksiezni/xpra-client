@@ -52,14 +52,14 @@ public class HeaderChunk implements StreamChunk {
 	}
 
 	private StreamChunk parseHeader() throws IOException {
-		if(buffer[0] != 'P') {
-			throw new IOException("Bad header. expected=80, received=" + buffer[0]);
-		}
 		final byte flags = buffer[1];
 		final byte compressionLevel = buffer[2];
 		final byte packetIndex = buffer[3];
 		final int packetSize = (buffer[4] & 0xFF) << 24 | (buffer[5] & 0xFF) << 16 | (buffer[6] & 0xFF) << 8 | (buffer[7] & 0xFF);
 		logger.trace("Header Received: " + toString() + ", size=" + packetSize);
+		if(buffer[0] != 'P') {
+			throw new IOException("Bad header. expected=80, received=" + buffer[0]);
+		}
 		if(hasFlags(flags, FLAG_CIPHER | FLAG_YAML | FLAG_LZ4 | FLAG_LZO | FLAGS_NOHEADER)) {
 			throw new RuntimeException("unsupported flags detected");
 		}

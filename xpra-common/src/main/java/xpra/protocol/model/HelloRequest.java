@@ -35,6 +35,8 @@ public class HelloRequest extends Packet {
 		final int[] screenDims = new int[] { screenWidth, screenHeight };
 		caps.put("desktop_size", screenDims);
 		caps.put("dpi", 96);
+		caps.put("dpi.x", 0);
+		caps.put("dpi.y", 0);
 		caps.put("client_type", "Java");
 		caps.put("screen_sizes", new int[][] { screenDims });
 		caps.put("encodings", encodings);
@@ -54,6 +56,12 @@ public class HelloRequest extends Packet {
 		caps.put("platform", System.getProperty("os.name").toLowerCase());
 		caps.put("uuid", UUID.randomUUID().toString().replace("-", ""));
 		setKeyboard(keyboard);
+	}
+
+	public void setDpi(int dpi, int xdpi, int ydpi) {
+		caps.put("dpi", dpi);		
+		caps.put("dpi.x", xdpi);		
+		caps.put("dpi.y", ydpi);		
 	}
 
 	public void setKeyboard(XpraKeyboard keyboard) {
