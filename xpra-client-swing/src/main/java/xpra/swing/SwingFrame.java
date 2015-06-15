@@ -8,10 +8,9 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-import xpra.network.XpraSender;
-import xpra.protocol.model.DrawPacket;
-import xpra.protocol.model.NewWindow;
-import xpra.protocol.model.WindowMetadata;
+import xpra.protocol.packets.DrawPacket;
+import xpra.protocol.packets.NewWindow;
+import xpra.protocol.packets.WindowMetadata;
 
 /**
  * @author Jakub Księżniak
@@ -21,15 +20,14 @@ public class SwingFrame extends SwingWindow<JFrame> {
 
 	private final XpraCanvas canvas;
 
-	public SwingFrame(int id, XpraSender sender) {
-		super(id, sender, new JFrame());
+	public SwingFrame(NewWindow wnd) {
+		super(wnd, new JFrame());
 		canvas = new XpraCanvas(this);
 	}
 
 	@Override
 	protected void onStart(NewWindow wnd) {
-		updateMetadata(wnd.getMetadata());
-		
+		super.onStart(wnd);
 		window.setLocation(wnd.getX(), wnd.getY());
 		window.getContentPane().setPreferredSize(new Dimension(wnd.getWidth(), wnd.getHeight()));
 		window.getContentPane().add(canvas);
@@ -47,8 +45,8 @@ public class SwingFrame extends SwingWindow<JFrame> {
 	}
 	
 	@Override
-	protected void updateMetadata(WindowMetadata metadata) {
-		super.updateMetadata(metadata);
+	protected void onMetadataUpdate(WindowMetadata metadata) {
+		super.onMetadataUpdate(metadata);
 		final String title = metadata.getAsString("title");
 		if(title != null) {
 			window.setTitle(title);

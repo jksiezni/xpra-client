@@ -10,5 +10,13 @@ package xpra.protocol;
 public enum PictureEncoding {
 	unknown,
 	png,
-	jpeg
+	jpeg;
+	
+	public static PictureEncoding valueOfSafe(String name) {
+		try {
+			return valueOf(name);
+		} catch(IllegalArgumentException e) {
+			return unknown;
+		}
+	}
 }

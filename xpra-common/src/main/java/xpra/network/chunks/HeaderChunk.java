@@ -1,5 +1,6 @@
 package xpra.network.chunks;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class HeaderChunk implements StreamChunk {
 	public StreamChunk readChunk(InputStream is, XpraConnector connector) throws IOException {
 		final int bytesRead = is.read(buffer, headerRead, buffer.length-headerRead);
 		if(bytesRead < 0) {
-			return null;
+			throw new EOFException("Failed to read header.");
 		}
 		headerRead += bytesRead;
 		if(headerRead == buffer.length) {
@@ -66,7 +67,7 @@ public class HeaderChunk implements StreamChunk {
 		
 		StreamChunk packetChunk;
 		if(packetIndex > 0) {
-			packetChunk = new PatchChunk(packetIndex, packetSize, patches);
+			packetChunk = new PatchChunk(packetIndex, packetSize, patches, compressionLevel > 0);
 		} else {
 			packetChunk = hasFlags(flags, FLAG_RENCODE) ? 
 					new RencodedPacketChunk(patches): 

@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.github.jksiezni.xpra.XpraActivity" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <!-- The main content view -->
+        <RelativeLayout
+            android:id="@+id/xpraLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- The navigation drawer -->
+        <android.support.design.widget.NavigationView
+	        android:id="@+id/navigation_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="start"
+	        app:headerLayout="@layout/drawer_header"
+	        app:menu="@menu/windows_drawer"/>
+        <!-- <include
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            layout="@layout/navigation_drawer" /> -->
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

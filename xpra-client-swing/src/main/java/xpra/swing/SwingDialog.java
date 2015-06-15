@@ -9,11 +9,10 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 
-import xpra.network.XpraSender;
 import xpra.protocol.PictureEncoding;
-import xpra.protocol.model.DrawPacket;
-import xpra.protocol.model.NewWindow;
-import xpra.protocol.model.WindowMetadata;
+import xpra.protocol.packets.DrawPacket;
+import xpra.protocol.packets.NewWindow;
+import xpra.protocol.packets.WindowMetadata;
 
 /**
  * @author Jakub Księżniak
@@ -23,14 +22,14 @@ public class SwingDialog extends SwingWindow<JDialog> {
 
 	private final SwingWindow<?> owner;
 
-	public SwingDialog(int id, XpraSender sender, SwingWindow<?> owner) {
-		super(id, sender, new JDialog(owner != null ? owner.window : null));
+	public SwingDialog(NewWindow wnd, SwingWindow<?> owner) {
+		super(wnd, new JDialog(owner != null ? owner.window : null));
 		this.owner = owner;
 	}
 
 	@Override
 	protected void onStart(NewWindow wnd) {
-		updateMetadata(wnd.getMetadata());
+		super.onStart(wnd);
 		window.setLocation(wnd.getX()+owner.offsetX, wnd.getY() + owner.offsetY);
 		window.getContentPane().setPreferredSize(new Dimension(wnd.getWidth(), wnd.getHeight()));
 		window.pack();
@@ -49,8 +48,8 @@ public class SwingDialog extends SwingWindow<JDialog> {
 	}
 	
 	@Override
-	protected void updateMetadata(WindowMetadata metadata) {
-		super.updateMetadata(metadata);
+	protected void onMetadataUpdate(WindowMetadata metadata) {
+		super.onMetadataUpdate(metadata);
 		String title = metadata.getAsString("title");
 		window.setTitle(title != null ? title : "unknown");
 		if(!metadata.getAsBoolean("decorations") && !window.isDisplayable()) {

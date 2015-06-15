@@ -7,9 +7,8 @@ import javax.swing.Popup;
 import javax.swing.PopupFactory;
 
 import xpra.client.XpraWindow;
-import xpra.network.XpraSender;
-import xpra.protocol.model.DrawPacket;
-import xpra.protocol.model.NewWindow;
+import xpra.protocol.packets.DrawPacket;
+import xpra.protocol.packets.NewWindow;
 
 /**
  * @author Jakub Księżniak
@@ -22,8 +21,8 @@ public class SwingPopup extends XpraWindow {
 	private XpraCanvas canvas;
 	private Popup popup;
 
-	public SwingPopup(int id, XpraSender sender, SwingWindow<?> rootWnd) {
-		super(id, sender);
+	public SwingPopup(NewWindow wnd, SwingWindow<?> rootWnd) {
+		super(wnd);
 		this.owner = rootWnd;
 	}
 
@@ -53,6 +52,10 @@ public class SwingPopup extends XpraWindow {
 	@Override
 	public void draw(DrawPacket packet) {
 		canvas.draw(packet);
+	}
+	
+	public SwingWindow<?> getOwner() {
+		return owner;
 	}
 
 }

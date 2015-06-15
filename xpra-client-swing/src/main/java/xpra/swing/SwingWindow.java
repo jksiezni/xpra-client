@@ -14,8 +14,9 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 import xpra.client.XpraWindow;
-import xpra.network.XpraSender;
-import xpra.protocol.model.WindowMetadata;
+import xpra.protocol.packets.NewWindow;
+import xpra.protocol.packets.WindowIcon;
+import xpra.protocol.packets.WindowMetadata;
 
 
 /**
@@ -31,8 +32,8 @@ public abstract class SwingWindow<T extends Window> extends XpraWindow
 	protected int offsetY;
 	
 	
-	public SwingWindow(int id, XpraSender sender, T window) {
-		super(id, sender);
+	public SwingWindow(NewWindow wnd, T window) {
+		super(wnd);
 		this.window = window;
 		window.addWindowFocusListener(this);
 		window.addWindowListener(this);
@@ -40,11 +41,16 @@ public abstract class SwingWindow<T extends Window> extends XpraWindow
 	}
 
 	@Override
-	protected void updateMetadata(WindowMetadata metadata) {
-		switch (metadata.getIconEncoding()) {
+	protected void onMetadataUpdate(WindowMetadata metadata) {
+		super.onMetadataUpdate(metadata);
+	}
+	
+	@Override
+	protected void onIconUpdate(WindowIcon windowIcon) {
+		switch (windowIcon.encoding) {
 		case png:
 		case jpeg:
-			changeIcon(metadata.getIconData());
+			changeIcon(windowIcon.data);
 			break;
 
 		default:

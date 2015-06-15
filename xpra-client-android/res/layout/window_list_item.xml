@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/textView1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:drawableLeft="@mipmap/ic_launcher"
+    android:drawablePadding="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="20dp"
+    android:gravity="center_vertical"
+    android:text="@string/app_name"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    android:background="@drawable/window_selector" >
+
+</TextView>

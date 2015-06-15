@@ -19,6 +19,8 @@ public class InflaterPacketChunk implements StreamChunk {
 
 	private final int packetSize;
 	private final StreamChunk parent;
+	
+	private final Inflater inflater = new Inflater();
 
 	public InflaterPacketChunk(byte compressionLevel, int packetSize, StreamChunk parent) {
 		this.packetSize = packetSize;
@@ -27,7 +29,7 @@ public class InflaterPacketChunk implements StreamChunk {
 
 	@Override
 	public StreamChunk readChunk(InputStream is, XpraConnector connector) throws IOException {
-		final ChunkInflaterInputStream inflaterInputStream = new ChunkInflaterInputStream(is, new Inflater(), packetSize);
+		final ChunkInflaterInputStream inflaterInputStream = new ChunkInflaterInputStream(is, inflater, packetSize);
 		final StreamChunk chunk = parent.readChunk(inflaterInputStream, connector);
 		inflaterInputStream.drain();
 		return chunk;
@@ -69,6 +71,11 @@ public class InflaterPacketChunk implements StreamChunk {
 				}
 				toRead -= len;
 			}
+		}
+		
+		@Override
+		public int available() throws IOException {
+			return inf.finished() ? 0 : 1;
 		}
 	}
 }

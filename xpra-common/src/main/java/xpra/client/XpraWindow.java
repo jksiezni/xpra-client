@@ -4,29 +4,36 @@
 package xpra.client;
 
 import xpra.network.XpraSender;
-import xpra.protocol.model.CloseWindow;
-import xpra.protocol.model.ConfigureWindow;
-import xpra.protocol.model.DrawPacket;
-import xpra.protocol.model.FocusRequest;
-import xpra.protocol.model.KeyAction;
-import xpra.protocol.model.MapWindow;
-import xpra.protocol.model.MouseButtonAction;
-import xpra.protocol.model.NewWindow;
-import xpra.protocol.model.PointerPosition;
-import xpra.protocol.model.UnmapWindow;
-import xpra.protocol.model.WindowMetadata;
+import xpra.protocol.packets.CloseWindow;
+import xpra.protocol.packets.ConfigureWindow;
+import xpra.protocol.packets.DrawPacket;
+import xpra.protocol.packets.FocusRequest;
+import xpra.protocol.packets.KeyAction;
+import xpra.protocol.packets.MapWindow;
+import xpra.protocol.packets.MouseButtonAction;
+import xpra.protocol.packets.NewWindow;
+import xpra.protocol.packets.PointerPosition;
+import xpra.protocol.packets.UnmapWindow;
+import xpra.protocol.packets.WindowIcon;
+import xpra.protocol.packets.WindowMetadata;
 
 /**
  * @author Jakub Księżniak
  *
  */
-public abstract class XpraWindow implements XpraInput {
+public abstract class XpraWindow {
 
 	private final int id;
-	private final XpraSender sender;
+	private XpraSender sender;
 	
-	public XpraWindow(int id, XpraSender sender) {
-		this.id = id;
+	private final int parentId;
+	
+	public XpraWindow(NewWindow wndPacket) {
+		this.id = wndPacket.getWindowId();
+		this.parentId = wndPacket.getMetadata().getParentId();
+	}
+	
+	void setSender(XpraSender sender) {
 		this.sender = sender;
 	}
 	
@@ -34,10 +41,32 @@ public abstract class XpraWindow implements XpraInput {
 		return id;
 	}
 	
-	protected abstract void onStart(NewWindow wnd);
+	public int getParentId() {
+		return parentId;
+	}
+	
+	public boolean hasParent() {
+		return parentId != WindowMetadata.NO_PARENT;
+	}
+	
+	protected void onStart(NewWindow wnd) {
+		onMetadataUpdate(wnd.getMetadata());
+	}
 	
 	protected abstract void onStop();
 	
+	protected void onMetadataUpdate(WindowMetadata metadata) {
+		onIconUpdate(metadata.getIcon());
+	}
+
+	protected void onMoveResize(ConfigureWindow config) {
+		// empty
+	}
+	
+	protected void onIconUpdate(WindowIcon windowIcon) {
+		
+	}
+
 	public abstract void draw(DrawPacket packet);
 
 	protected void setFocused(boolean focused) {
@@ -70,18 +99,12 @@ public abstract class XpraWindow implements XpraInput {
 	
 	public void mouseAction(int button, boolean pressed, int x, int y) {
 		if(x < 0 || y < 0) {
-			System.err.println("Minus coords");
-			System.exit(1);
+			throw new IllegalArgumentException("Minus coordinates are not allowed: " + x + ", " + y);
 		}
 		sender.send(new MouseButtonAction(id, button, pressed, x, y));
 	}
 	
-	@Override
 	public void keyboardAction(int keycode, String keyname, boolean pressed) {
 		sender.send(new KeyAction(id, keycode, keyname, pressed));
-	}
-
-	protected void updateMetadata(WindowMetadata metadata) {
-		// empty
 	}
 }

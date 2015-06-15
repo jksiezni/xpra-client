@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import xpra.client.XpraClient;
 import xpra.network.chunks.HeaderChunk;
 import xpra.network.chunks.StreamChunk;
-import xpra.protocol.model.Disconnect;
+import xpra.protocol.packets.Disconnect;
 
 /**
  * @author Jakub Księżniak
@@ -49,8 +49,8 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 		if(thread != null) {
 			if(!disconnectCleanly()) {
     		thread.interrupt();
-    		thread = null;
 			}
+			thread = null;
 		}
 	}
 
@@ -70,6 +70,8 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 				OutputStream os = socket.getOutputStream();) {
 			socket.setKeepAlive(true);
 			client.onConnect(new XpraSender(os));
+			fireOnConnectedEvent();
+			
 			StreamChunk reader = new HeaderChunk();
 			logger.info("Start Xpra connection...");
 			while(!Thread.interrupted() && !client.isDisconnectedByServer()) {
@@ -78,9 +80,14 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 			logger.info("Finnished Xpra connection!");
 		} catch (IOException e) {
 			client.onConnectionError(e);
+			fireOnConnectionErrorEvent(e);
 		}
 		finally {
+			if(client.getSender() != null) {
+				client.getSender().setClosed(true);
+			}
 			client.onDisconnect();
+			fireOnDisconnectedEvent();
 		}
 	}
 

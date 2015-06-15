@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 
 import xpra.client.XpraClient;
 import xpra.network.SshXpraConnector;
+import xpra.network.TcpXpraConnector;
 import xpra.network.XpraConnector;
 
 import com.jcraft.jsch.UserInfo;
@@ -21,8 +22,9 @@ public class Launcher {
 
 	public static void main(String[] args) throws Exception {
 		XpraClient client = new SwingXpraClient();
-		//XpraConnector connector = new TcpXpraConnector(client, "localhost", 10000);
-		XpraConnector connector = createSSH(client);
+		XpraConnector connector = new TcpXpraConnector(client, "localhost", 10000);
+		//XpraConnector connector = createSSH(client);
+
 		connector.connect();
 		while (connector.isRunning());
 	}

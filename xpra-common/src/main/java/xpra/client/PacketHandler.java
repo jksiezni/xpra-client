@@ -6,7 +6,7 @@ package xpra.client;
 import java.io.IOException;
 import java.util.List;
 
-import xpra.protocol.model.Packet;
+import xpra.protocol.packets.Packet;
 
 /**
  * @author Jakub Księżniak

@@ -20,9 +20,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-import xpra.client.XpraInput;
+import xpra.client.XpraWindow;
 import xpra.protocol.PictureEncoding;
-import xpra.protocol.model.DrawPacket;
+import xpra.protocol.packets.DrawPacket;
 import xpra.swing.keyboard.KeyMap;
 
 
@@ -33,12 +33,12 @@ import xpra.swing.keyboard.KeyMap;
 public class XpraCanvas extends Canvas implements HierarchyListener, MouseListener, MouseMotionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 	
-	private final XpraInput xinput;
+	private final XpraWindow xwnd;
 
 	private Window window;
 
-	public XpraCanvas(XpraInput xinput) {
-		this.xinput = xinput;
+	public XpraCanvas(XpraWindow window) {
+		this.xwnd = window;
 		addHierarchyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -85,13 +85,13 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.mouseAction(e.getButton(), true, p.x, p.y);		
+		xwnd.mouseAction(e.getButton(), true, p.x, p.y);		
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.movePointer(p.x, p.y);
+		xwnd.movePointer(p.x, p.y);
 	}
 
 	@Override
@@ -102,25 +102,25 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 	@Override
 	public void mousePressed(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.mouseAction(e.getButton(), true, p.x, p.y);
+		xwnd.mouseAction(e.getButton(), true, p.x, p.y);
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.mouseAction(e.getButton(), false, p.x, p.y);
+		xwnd.mouseAction(e.getButton(), false, p.x, p.y);
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.movePointer(p.x, p.y);
+		xwnd.movePointer(p.x, p.y);
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
 		Point p = getTruePos(e.getXOnScreen(), e.getYOnScreen());
-		xinput.movePointer(p.x, p.y);
+		xwnd.movePointer(p.x, p.y);
 	}
 
 	@Override
@@ -130,12 +130,12 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		xinput.keyboardAction(e.getKeyCode(), KeyMap.getUnicodeName(e.getKeyCode()), true);
+		xwnd.keyboardAction(e.getKeyCode(), KeyMap.getUnicodeName(e.getKeyCode()), true);
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		xinput.keyboardAction(e.getKeyCode(), KeyMap.getUnicodeName(e.getKeyCode()), false);
+		xwnd.keyboardAction(e.getKeyCode(), KeyMap.getUnicodeName(e.getKeyCode()), false);
 	}
 
 }

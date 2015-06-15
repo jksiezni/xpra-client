@@ -41,5 +41,10 @@ public interface XpraKeyboard {
 			list.add(level);
 			return list;
 		}
+		
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "( " + keycode + ", " + keyname + ")";
+		}
 	}
 }

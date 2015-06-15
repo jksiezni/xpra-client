@@ -12,5 +12,4 @@ import xpra.network.XpraConnector;
 public interface StreamChunk {
 	
 	StreamChunk readChunk(InputStream is, XpraConnector connector) throws IOException;
-	
 }

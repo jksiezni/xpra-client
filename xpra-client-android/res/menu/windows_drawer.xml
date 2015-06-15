@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/xpra_windows_section"
+        android:title="Taskbar">
+        <menu>
+            <group android:id="@+id/xpra_windows_group"
+                android:checkableBehavior="single" />
+        </menu>
+    </item>
+    
+    <item
+        android:id="@+id/drawer_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings_applications_black_36dp" />
+    <item
+        android:id="@+id/drawer_disconnect"
+        android:title="Disconnect"
+        android:icon="@drawable/ic_power_settings_new_black_36dp" />
+
+</menu>

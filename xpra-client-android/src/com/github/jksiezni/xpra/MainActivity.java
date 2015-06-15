@@ -1,59 +1,59 @@
 package com.github.jksiezni.xpra;
 
-import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import com.github.jksiezni.xpra.R;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends Activity {
+import com.github.jksiezni.xpra.db.DatabaseHelper;
+import com.github.jksiezni.xpra.fragments.ServersListFragment;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+
+public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
+
+	private DatabaseHelper database;
+	
+	private FloatingActionButton floatingButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		database = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+
+		// Set the custom toolbar
+		final Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+		
+		floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
+
 		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
+			getFragmentManager().beginTransaction().add(R.id.container, new ServersListFragment()).commit();
 		}
-//		TcpXpraConnector connector = new TcpXpraConnector("10.0.2.2", 10000, new XpraClient());
-//		connector.connect();
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	protected void onDestroy() {
+		OpenHelperManager.releaseHelper();
+		super.onDestroy();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(!getFragmentManager().popBackStackImmediate()) {
+			super.onBackPressed();
+		}
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+	public DatabaseHelper getHelper() {
+		return database;
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-			return rootView;
-		}
+	@Override
+	public FloatingActionButton getFloatingActionButton() {
+		return floatingButton;
 	}
+
 }

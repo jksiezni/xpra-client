@@ -18,15 +18,24 @@ android {
     }
 }
 
+repositories {
+	maven { url new File(android.getSdkDirectory(), "extras/android/m2repository") }
+}
+
 configurations {
 }
 
 dependencies {
 	compile project(':xpra-common')
 	compile 'org.slf4j:slf4j-android:1.7.+'
+	compile 'com.j256.ormlite:ormlite-android:4.48'
 
-	//compile 'com.danh32:fontify:1.0-SNAPSHOT'
+	compile 'com.android.support:appcompat-v7:+'
+	compile 'com.android.support:design:+'
+	
 	//compile 'com.android.support:support-v13:+'
+	//compile 'com.android.support:recyclerview-v7:+'
+	//compile 'com.danh32:fontify:1.0-SNAPSHOT'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.

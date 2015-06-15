@@ -1,0 +1,38 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.github.jksiezni.xpra.XpraActivity" >
+
+    <item
+        android:id="@+id/action_zoomin"
+        android:icon="@drawable/ic_zoom_in_black_48dp"
+        android:orderInCategory="100"
+        android:title="Zoom in"
+        app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/action_zoomout"
+        android:icon="@drawable/ic_zoom_out_black_48dp"
+        android:orderInCategory="100"
+        android:title="Zoom out"
+        app:showAsAction="collapseActionView"/>
+    <item
+        android:id="@+id/action_keyboard"
+        android:icon="@drawable/ic_keyboard_black_24dp"
+        android:orderInCategory="100"
+        android:title="Keyboard"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_close"
+        android:icon="@drawable/ic_close_black_48dp"
+        android:orderInCategory="100"
+        android:title="Exit"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_cursor"
+        android:checkable="true"
+        android:icon="@drawable/ic_play_arrow_white_48dp"
+        android:orderInCategory="100"
+        android:title="Cursor mode"
+        app:showAsAction="collapseActionView"/>
+
+</menu>

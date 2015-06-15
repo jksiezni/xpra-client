@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="General settings" >
+        <ListPreference
+            android:key="connection_type"
+            android:defaultValue="TCP"
+            android:entries="@array/connection_type_names"
+            android:entryValues="@array/connection_type_values"
+            android:summary="@string/connection_type_tcp"
+            android:title="Connection type" />
+
+        <EditTextPreference
+            android:key="name"
+            android:defaultValue=""
+            android:summary="Enter a unique connection name"
+            android:title="Connection name"
+            android:inputType="text" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Connection setup" >
+        <EditTextPreference
+            android:key="host"
+            android:defaultValue=""
+            android:summary="Enter the hostname"
+            android:title="Hostname"
+            android:inputType="text" />
+        <EditTextPreference
+            android:key="port"
+            android:defaultValue="10000"
+            android:summary="10000"
+            android:title="Port"
+            android:inputType="number" />
+        <EditTextPreference
+            android:key="display_id"
+            android:defaultValue="-1"
+            android:summary="Automatic"
+            android:title="Display ID"
+            android:inputType="number" />
+        <EditTextPreference
+            android:key="username"
+            android:defaultValue=""
+            android:enabled="false"
+            android:summary="Enter your username"
+            android:title="SSH Username" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
