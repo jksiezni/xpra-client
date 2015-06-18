@@ -43,6 +43,12 @@
             android:enabled="false"
             android:summary="Enter your username"
             android:title="SSH Username" />
+        <com.github.jksiezni.xpra.preference.FileChooserPreference
+            android:key="private_keyfile"
+            android:defaultValue=""
+            android:enabled="false"
+            android:summary="Choose a private key file"
+            android:title="SSH Private key" />
     </PreferenceCategory>
 
 

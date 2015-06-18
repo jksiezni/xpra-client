@@ -50,6 +50,7 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 		this.username = username;
 		this.port = port;
 		this.userInfo = userInfo;
+		JSch.setConfig("compression_level", "0");
 	}
 
 	@Override
@@ -138,6 +139,10 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 			client.onDisconnect();
 			fireOnDisconnectedEvent();
 		}
+	}
+
+	public JSch getJsch() {
+		return jsch;
 	}
 
 }

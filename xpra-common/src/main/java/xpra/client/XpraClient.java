@@ -114,7 +114,10 @@ public abstract class XpraClient {
 			@Override
 			protected void process(DrawPacket drawing) throws IOException {
 				final long start = System.currentTimeMillis();
-				windows.get(drawing.getWindowId()).draw(drawing);
+				XpraWindow xpraWindow = windows.get(drawing.getWindowId());
+				if(xpraWindow != null) {
+					xpraWindow.draw(drawing);
+				}
 				if (drawing.packet_sequence >= 0) {
           sender.send(new DamageSequence(drawing, System.currentTimeMillis()-start));
 				}

@@ -26,6 +26,7 @@ import com.github.jksiezni.xpra.R;
 import com.github.jksiezni.xpra.XpraActivity;
 import com.github.jksiezni.xpra.db.entities.Connection;
 import com.github.jksiezni.xpra.db.entities.ConnectionType;
+import com.github.jksiezni.xpra.preference.PreferenceHelper;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 /**
@@ -76,8 +77,10 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				.putString("name", connection.name)
 				.putString("host", connection.host)
 				.putString("username", connection.username)
+				.putString("private_keyfile", connection.sshPrivateKeyFile)
 				.putString("port", String.valueOf(connection.port))
-				.putString("display_id", String.valueOf(connection.displayId)).apply();
+				.putString("display_id", String.valueOf(connection.displayId))
+				.apply();
 		}
 
 		// Load the preferences from an XML resource
@@ -136,6 +139,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 		findPreference("name").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter a unique connection name"));
 		findPreference("host").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter the hostname"));
 		findPreference("username").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter your username"));
+		findPreference("private_keyfile").setOnPreferenceChangeListener(new SimplePreferenceChanger("Choose a private key file"));
 		findPreference("connection_type").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
@@ -188,6 +192,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 			}
 		}
 		findPreference("username").setEnabled(enabled);
+		findPreference("private_keyfile").setEnabled(enabled);
 	}
 
 	protected boolean validateName(String name) {
@@ -226,11 +231,12 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	private boolean save() {
 		final SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 		if (validate(prefs)) {
-			connection.name = prefs.getString("name", "");
+			connection.name = prefs.getString("name", null);
 			connection.type = ConnectionType.valueOf(prefs.getString("connection_type", "TCP"));
-			connection.host = prefs.getString("host", "");
+			connection.host = prefs.getString("host", null);
 			connection.port = Integer.parseInt(prefs.getString("port", "10000"));
-			connection.username = prefs.getString("username", "");
+			connection.username = prefs.getString("username", null);
+			connection.sshPrivateKeyFile = prefs.getString("private_keyfile", null);
 			connectionDao.createOrUpdate(connection);
 			return true;
 		}

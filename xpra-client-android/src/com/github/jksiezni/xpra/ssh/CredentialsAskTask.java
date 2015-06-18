@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -59,6 +60,7 @@ final class CredentialsAskTask extends UiTask<Void, Boolean> {
 		@Override
 		public Dialog onCreateDialog(Bundle savedInstanceState) {
 			layout = new LinearLayout(getActivity());
+			layout.setOrientation(LinearLayout.VERTICAL);
 			buildPrompts(layout);
 			
 			return new AlertDialog.Builder(getActivity())
@@ -82,9 +84,13 @@ final class CredentialsAskTask extends UiTask<Void, Boolean> {
 		
 		protected void dumpAnswers() {
 			for(int i = 0; i < prompt.length; ++i) {
-				EditText passwdEditText = (EditText) layout.findViewWithTag(prompt[i]).findViewById(R.id.passwdEditText);
+				EditText passwdEditText = getPasswordEditText(i);
 				answers[i] = passwdEditText.getText().toString();
 			}
+		}
+
+		private EditText getPasswordEditText(int i) {
+			return (EditText) layout.findViewWithTag(prompt[i]).findViewById(R.id.passwdEditText);
 		}
 
 		private void buildPrompts(LinearLayout layout) {
@@ -101,12 +107,33 @@ final class CredentialsAskTask extends UiTask<Void, Boolean> {
 					editView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 				}
 			}
+			final CheckBox checkbox = new CheckBox(getActivity());
+			checkbox.setText("Show password");
+			checkbox.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					showPasswords(checkbox.isChecked());
+				}
+			});
+			layout.addView(checkbox);
 		}
 
 		@Override
 		public void onCancel(DialogInterface dialog) {
 			super.onCancel(dialog);
 			postResult(false);
+		}
+		
+		protected void showPasswords(boolean show) {
+			for(int i = 0; i < prompt.length; ++i) {
+				if(!echo[i]) {
+					EditText passEditText = getPasswordEditText(i);
+					passEditText.setInputType(show ? 
+							(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+							: InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					passEditText.setSelection(passEditText.length());
+				}
+			}
 		}
 
 		public String getPassword() {

@@ -25,13 +25,18 @@ public class SshUserInfoHandler implements UserInfo, UIKeyboardInteractive {
 
 	@Override
 	public boolean promptPassphrase(String message) {
-		return false;
+		try {
+			passwordTask = new CredentialsAskTask(activity.getFragmentManager(), message);
+			return passwordTask.execute().get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override
 	public String getPassphrase() {
-		// TODO Auto-generated method stub
-		return null;
+		return passwordTask.getPassword();
 	}
 
 	@Override

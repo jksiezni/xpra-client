@@ -46,7 +46,7 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 
 	private final Renderer renderer;
 	
-	private List<XpraWindowListener> listeners = new ArrayList<>();
+	private final List<XpraWindowListener> listeners = new ArrayList<>();
 	
 	// window properties
 	private String title;
@@ -236,6 +236,10 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 		return true;
 	}
 
+	public void close() {
+		closeWindow();
+	}
+
 	private class Renderer extends HandlerThread implements SurfaceTextureListener {
 
 		public Renderer() {
@@ -255,6 +259,9 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 		@Override
 		public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
 			Log.i(getClass().getSimpleName(), "onSurfaceTextureSizeChanged(): " + width + "x" + height);
+			final int x = (int) getView().getX();
+			final int y = (int) getView().getY();
+			mapWindow(x, y, width, height);
 		}
 
 		@Override
@@ -275,10 +282,6 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 	public interface XpraWindowListener {
 		void onMetadataChanged(AndroidXpraWindow window);
 		void onIconChanged(AndroidXpraWindow window);
-	}
-
-	public void close() {
-		closeWindow();
 	}
 
 }

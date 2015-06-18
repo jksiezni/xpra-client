@@ -1,5 +1,6 @@
 package com.github.jksiezni.xpra;
 
+import java.io.File;
 import java.io.IOException;
 
 import xpra.network.SshXpraConnector;
@@ -37,6 +38,7 @@ import com.github.jksiezni.xpra.db.DatabaseHelper;
 import com.github.jksiezni.xpra.db.entities.Connection;
 import com.github.jksiezni.xpra.ssh.SshUserInfoHandler;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.jcraft.jsch.JSchException;
 
 public class XpraActivity extends AppCompatActivity implements OnStackListener,
 	OnNavigationItemSelectedListener, XpraWindowListener {
@@ -146,10 +148,26 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 			connector = new TcpXpraConnector(xpraClient, c.host, c.port);
 			break;
 		case SSH:
-			connector = new SshXpraConnector(xpraClient, c.host, c.username, c.port, new SshUserInfoHandler(this));
+			SshXpraConnector sshConnector = new SshXpraConnector(xpraClient, c.host, c.username, c.port, new SshUserInfoHandler(this));
+			setupSSHConnector(sshConnector, c);
+			this.connector = sshConnector;
 		default:
 			break;
 		}
+	}
+
+	private void setupSSHConnector(SshXpraConnector connector, Connection c) {
+		try {
+			final File knownHosts = getFileStreamPath("known_hosts");
+			knownHosts.createNewFile();
+			connector.getJsch().setKnownHosts(knownHosts.getAbsolutePath());
+			if(c.sshPrivateKeyFile != null) {
+				connector.getJsch().addIdentity(c.sshPrivateKeyFile);
+			}
+		} catch (JSchException | IOException e) {
+			// TODO implement some fix if necessary 
+			e.printStackTrace();
+		}		
 	}
 
 	private void toggleKeyboard() {

@@ -15,13 +15,20 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+/**
+ * 
+ * @author Jakub Księżniak
+ *
+ */
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	static final Logger logger = LoggerFactory.getLogger(DatabaseHelper.class);
 
 	private static final String DATABASE_NAME = "xpra_client.db";
 
-	// any time you make changes to your database objects, you may have to
-	// increase the database version
+	/**
+	 * Any time you make changes to your database objects,
+	 * you may have to increase the database version.
+	 */
 	private static final int DATABASE_VERSION = 1;
 
 	private RuntimeExceptionDao<Connection, Integer> connectionDao = null;
@@ -43,7 +50,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		logger.debug("onUpgrade(%d -> %d)", oldVersion, newVersion);
-
 	}
 
 	public synchronized RuntimeExceptionDao<Connection, Integer> getConnectionDao() {

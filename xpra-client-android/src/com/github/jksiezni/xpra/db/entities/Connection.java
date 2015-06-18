@@ -29,6 +29,9 @@ public class Connection {
 	@DatabaseField
 	public String username;
 	
+	@DatabaseField(columnName="private_key_file")
+	public String sshPrivateKeyFile;
+	
 	
 	public int getId() {
 		return id;
