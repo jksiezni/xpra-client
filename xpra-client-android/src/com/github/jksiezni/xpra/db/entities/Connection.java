@@ -24,7 +24,7 @@ public class Connection {
 	public int port;
 	
 	@DatabaseField(columnName="display_id")
-	public int displayId;
+	public int displayId = -1;
 
 	@DatabaseField
 	public String username;

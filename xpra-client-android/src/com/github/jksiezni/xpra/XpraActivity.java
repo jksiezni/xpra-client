@@ -164,6 +164,9 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 			if(c.sshPrivateKeyFile != null) {
 				connector.getJsch().addIdentity(c.sshPrivateKeyFile);
 			}
+			if(c.displayId >= 0) {
+				connector.setDisplay(c.displayId);
+			}
 		} catch (JSchException | IOException e) {
 			// TODO implement some fix if necessary 
 			e.printStackTrace();

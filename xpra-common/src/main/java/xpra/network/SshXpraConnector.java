@@ -32,6 +32,8 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 	private final String username;
 	private final String host;
 	private final int port;
+	
+	private int display = 100;
 
 	private Thread thread;
 	private Session session;
@@ -111,7 +113,7 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 		try {
 			session.connect();
 			final Channel channel = session.openChannel("exec");
-			((ChannelExec) channel).setCommand("~/.xpra/run-xpra _proxy :100");
+			((ChannelExec) channel).setCommand("~/.xpra/run-xpra _proxy :" + display);
 			channel.connect();
 
 			final InputStream in = channel.getInputStream();
@@ -143,6 +145,10 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 
 	public JSch getJsch() {
 		return jsch;
+	}
+	
+	public void setDisplay(int displayId) {
+		this.display = displayId;
 	}
 
 }
