@@ -75,19 +75,22 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 		navigationView.setItemIconTintList(null);
 		navigationView.setNavigationItemSelectedListener(this);
 
-		// Setup Xpra client
-		xpraLayout = (RelativeLayout) findViewById(R.id.xpraLayout);
-		xpraClient = new AndroidXpraClient(xpraLayout);
-		xpraClient.setStackListener(this);
-		
-		// Setup connection
+		// get connection
 		final Intent intent = getIntent();
 		if(intent == null) {
 			finish();
 			return;
 		}
 		final int id = intent.getIntExtra("connection_id", 0);
-		Connection c = database.getConnectionDao().queryForId(id);
+		final Connection c = database.getConnectionDao().queryForId(id);
+		
+		// Setup Xpra client
+		xpraLayout = (RelativeLayout) findViewById(R.id.xpraLayout);
+		xpraClient = new AndroidXpraClient(xpraLayout);
+		xpraClient.setPictureEncoding(c.pictureEncoding);
+		xpraClient.setStackListener(this);
+		
+		// Setup connection
 		prepareConnector(c);
 		{
 			TextView tv = (TextView) navigationView.findViewById(R.id.connection_name);

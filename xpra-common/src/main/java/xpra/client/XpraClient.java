@@ -198,7 +198,6 @@ public abstract class XpraClient {
 	}
 	
 	protected void onWindowStarted(XpraWindow window) {
-		
 	}
 
 	protected void onCursorUpdate(CursorPacket cursorPacket) {
@@ -266,6 +265,10 @@ public abstract class XpraClient {
 		return disconnectedByServer;
 	}
 
+	public void setPictureEncoding(PictureEncoding pictureEncoding) {
+		this.encoding = pictureEncoding;
+	}
+	
 	
 	private class HelloHandler extends PacketHandler<HelloResponse> {
 
@@ -277,7 +280,8 @@ public abstract class XpraClient {
 
 		@Override
 		public void process(HelloResponse response) throws IOException {
-			logger.debug("Hello: " + response.getCaps().toString());
+			logger.debug(response.toString());
+			logger.debug("Server caps: " + response.getCaps().toString());
 			sender.useRencode(response.isRencode());
 			sender.send(setDeflate);
 		}

@@ -51,4 +51,13 @@
             android:title="SSH Private key" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Advanced">
+        <ListPreference
+            android:key="picture_encoding"
+            android:defaultValue="png"
+            android:summary="png"
+            android:title="Default picture encoding" />
+        
+    </PreferenceCategory>
+
 </PreferenceScreen>

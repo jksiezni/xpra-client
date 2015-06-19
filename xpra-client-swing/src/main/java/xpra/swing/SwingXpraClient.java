@@ -31,7 +31,7 @@ import xpra.swing.keyboard.SimpleXpraKeyboard;
  */
 public class SwingXpraClient extends XpraClient {
 
-	private static final PictureEncoding[] PICTURE_ENCODINGS = {PictureEncoding.png, PictureEncoding.jpeg};
+	private static final PictureEncoding[] PICTURE_ENCODINGS = {PictureEncoding.pngP, PictureEncoding.png, PictureEncoding.jpeg};
 	
 	private static int getDesktopWidth() {
 		return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;

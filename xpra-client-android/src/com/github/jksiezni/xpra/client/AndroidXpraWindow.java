@@ -16,7 +16,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
@@ -40,7 +39,6 @@ import android.widget.RelativeLayout.LayoutParams;
  */
 public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, OnKeyListener {
 	
-	private final Paint paint = new Paint();
 	private final TextureView textureView;
 	private final Handler uiHandler;
 
@@ -104,8 +102,13 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 	@Override
 	protected void onIconUpdate(WindowIcon windowIcon) {
 		super.onIconUpdate(windowIcon);
+		if(windowIcon.encoding == null) {
+			return;
+		}
 		switch (windowIcon.encoding) {
 		case png:
+		case pngL:
+		case pngP:
 		case jpeg:
 			icon = BitmapFactory.decodeByteArray(windowIcon.data, 0, windowIcon.data.length);
 			fireOnIconChanged();
@@ -173,13 +176,18 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 	@Override
 	public void draw(DrawPacket packet) {
 		Rect dirty = new Rect(packet.x, packet.y, packet.x + packet.w, packet.y + packet.h);
+		if(packet.encoding == null) {
+			return;
+		}
 		try {
 			Canvas canvas = textureView.lockCanvas(dirty);
 			switch (packet.encoding) {
 			case png:
+			case pngL:
+			case pngP:
 			case jpeg:
 				Bitmap bitmap = BitmapFactory.decodeByteArray(packet.data, 0, packet.data.length);
-				canvas.drawBitmap(bitmap, packet.x, packet.y, paint);
+				canvas.drawBitmap(bitmap, packet.x, packet.y, null);
 				bitmap.recycle();
 				break;
 

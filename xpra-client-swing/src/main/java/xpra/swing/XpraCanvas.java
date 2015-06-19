@@ -59,8 +59,10 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 	}
 
 	public void draw(DrawPacket packet) {
-		if(packet.encoding != PictureEncoding.png) {
-			throw new RuntimeException();
+		if(packet.encoding != PictureEncoding.png
+				&& packet.encoding != PictureEncoding.pngL
+				&& packet.encoding != PictureEncoding.pngP) {
+			throw new RuntimeException("Invalid encoding: " + packet.encoding);
 		}
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(packet.data));

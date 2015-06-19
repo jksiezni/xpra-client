@@ -26,8 +26,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	private static final String DATABASE_NAME = "xpra_client.db";
 
 	/**
-	 * Any time you make changes to your database objects,
-	 * you may have to increase the database version.
+	 * Any time you make changes to your database objects, you may have to
+	 * increase the database version.
 	 */
 	private static final int DATABASE_VERSION = 1;
 
@@ -50,15 +50,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 		logger.debug("onUpgrade(%d -> %d)", oldVersion, newVersion);
+		//RuntimeExceptionDao<Connection, Integer> dao = getConnectionDao();
+
+		if (oldVersion < 2) {
+			// added the private_key_file column in version 2
+			// dao.executeRaw("ALTER TABLE `connections` ADD COLUMN private_key_file TEXT;");
+		}
+		
 	}
 
 	public synchronized RuntimeExceptionDao<Connection, Integer> getConnectionDao() {
-		if (connectionDao == null) try {
-			Dao<Connection, Integer> dao = getDao(Connection.class);
-			connectionDao = new RuntimeExceptionDao<Connection, Integer>(dao);
-		} catch(SQLException e) {
-			throw new RuntimeException(e);
-		}
+		if (connectionDao == null)
+			try {
+				Dao<Connection, Integer> dao = getDao(Connection.class);
+				connectionDao = new RuntimeExceptionDao<Connection, Integer>(dao);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
 		return connectionDao;
 	}
 

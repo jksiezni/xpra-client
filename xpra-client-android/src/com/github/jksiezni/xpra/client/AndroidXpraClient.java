@@ -30,7 +30,7 @@ public class AndroidXpraClient extends XpraClient {
 	private static final int POP_WINDOW = 4;
 	private static final int CLOSE_WINDOW = 5;
 
-	private static final PictureEncoding[] PICTURE_ENCODINGS = { PictureEncoding.png, PictureEncoding.jpeg };
+	private static final PictureEncoding[] PICTURE_ENCODINGS = { PictureEncoding.png, PictureEncoding.pngL, PictureEncoding.pngP, PictureEncoding.jpeg };
 
 	private final RelativeLayout layout;
 	private OnStackListener stackListener;

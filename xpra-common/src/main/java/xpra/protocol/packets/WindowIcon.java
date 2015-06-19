@@ -15,7 +15,7 @@ public class WindowIcon extends WindowPacket {
 
 	public int width;
 	public int height;
-	public PictureEncoding encoding = PictureEncoding.unknown;
+	public PictureEncoding encoding;
 	public byte[] data;
 	
 	public WindowIcon() {
@@ -35,7 +35,7 @@ public class WindowIcon extends WindowPacket {
 	void readLocal(Iterator<?> iter) {
 		width = asInt(iter.next());
 		height = asInt(iter.next());
-		encoding = PictureEncoding.valueOfSafe(asString(iter.next()));
+		encoding = PictureEncoding.decode(asString(iter.next()));
 		data = (byte[]) iter.next();	
 	}
 

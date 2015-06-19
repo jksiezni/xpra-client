@@ -4,11 +4,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import xpra.protocol.PictureEncoding;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
@@ -80,6 +82,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				.putString("private_keyfile", connection.sshPrivateKeyFile)
 				.putString("port", String.valueOf(connection.port))
 				.putString("display_id", String.valueOf(connection.displayId))
+				.putString("picture_encoding", connection.pictureEncoding.toString())
 				.apply();
 		}
 
@@ -176,6 +179,10 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				return true;
 			}
 		});
+		ListPreference pictureEncPreference = (ListPreference) findPreference("picture_encoding");
+		pictureEncPreference.setEntries(PictureEncoding.toString(PictureEncoding.values()));
+		pictureEncPreference.setEntryValues(PictureEncoding.toString(PictureEncoding.values()));
+		pictureEncPreference.setOnPreferenceChangeListener(new SimplePreferenceChanger(""));
 	}
 
 	protected void setSshPreferencesEnabled(boolean enabled) {
@@ -237,6 +244,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 			connection.port = Integer.parseInt(prefs.getString("port", "10000"));
 			connection.username = prefs.getString("username", null);
 			connection.sshPrivateKeyFile = prefs.getString("private_keyfile", null);
+			connection.pictureEncoding = PictureEncoding.decode(prefs.getString("picture_encoding", "png"));
 			connectionDao.createOrUpdate(connection);
 			return true;
 		}

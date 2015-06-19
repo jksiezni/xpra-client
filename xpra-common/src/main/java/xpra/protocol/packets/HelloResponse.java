@@ -3,7 +3,11 @@
  */
 package xpra.protocol.packets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,4 +37,26 @@ public class HelloResponse extends Packet {
 		return asBoolean(capabilities.get("rencode"));
 	}
 
+	public List<String> getStringArray(String key) {
+		Object values = capabilities.get(key);
+		List<String> sList = new ArrayList<>();
+		if(values instanceof Collection) {
+			Collection<?> list = (Collection<?>) values;
+			for(Object elem : list) {
+				sList.add(asString(elem));
+			}
+		}
+		return sList;
+	}
+	
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder(getClass().getSimpleName());
+		builder.append(": ");
+		builder.append("encodings.allowed=");
+		builder.append(getStringArray("encodings.allowed"));
+		builder.append(", encodings=");
+		builder.append(getStringArray("encodings"));
+		return builder.toString();
+	}
 }

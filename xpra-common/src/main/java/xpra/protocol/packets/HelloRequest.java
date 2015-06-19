@@ -36,7 +36,7 @@ public class HelloRequest extends Packet {
 //		caps.put("dpi.y", 0);
 		caps.put("client_type", "Java");
 		caps.put("screen_sizes", new int[][] { screenDims });
-		caps.put("encodings", encodings);
+		caps.put("encodings", PictureEncoding.toString(encodings));
 		caps.put("clipboard", false);
 		caps.put("notifications", true);
 		caps.put("cursors", true);

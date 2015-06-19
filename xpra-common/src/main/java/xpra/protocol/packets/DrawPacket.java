@@ -26,7 +26,7 @@ public class DrawPacket extends WindowPacket {
 		y = asInt(iter.next());
 		w = asInt(iter.next());
 		h = asInt(iter.next());
-		encoding = PictureEncoding.valueOf(asString(iter.next()));
+		encoding = PictureEncoding.decode(asString(iter.next()));
 		data = asByteArray(iter.next());
 		packet_sequence = asInt(iter.next());
 		rowstride = asInt(iter.next());

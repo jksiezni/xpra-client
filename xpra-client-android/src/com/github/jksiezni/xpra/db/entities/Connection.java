@@ -2,6 +2,8 @@ package com.github.jksiezni.xpra.db.entities;
 
 import java.util.Locale;
 
+import xpra.protocol.PictureEncoding;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -32,6 +34,8 @@ public class Connection {
 	@DatabaseField(columnName="private_key_file")
 	public String sshPrivateKeyFile;
 	
+	@DatabaseField(columnName="picture_encoding", canBeNull = false)
+	public PictureEncoding pictureEncoding;
 	
 	public int getId() {
 		return id;
