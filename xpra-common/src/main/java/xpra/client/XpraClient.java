@@ -25,6 +25,7 @@ import xpra.protocol.packets.LostWindow;
 import xpra.protocol.packets.NewWindow;
 import xpra.protocol.packets.Ping;
 import xpra.protocol.packets.PingEcho;
+import xpra.protocol.packets.RaiseWindow;
 import xpra.protocol.packets.SetDeflate;
 import xpra.protocol.packets.WindowIcon;
 import xpra.protocol.packets.WindowMetadata;
@@ -161,6 +162,12 @@ public abstract class XpraClient {
 				if(window != null) {
 					window.onMoveResize(response);
 				}
+			}
+		});
+		setHandler(new PacketHandler<RaiseWindow>(RaiseWindow.class) {
+			@Override
+			protected void process(RaiseWindow response) throws IOException {
+				logger.info("raise-window: " + response.getWindowId());
 			}
 		});
 	}

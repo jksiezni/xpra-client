@@ -111,6 +111,9 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 	@Override
 	public void run() {
 		try {
+			session.setServerAliveInterval(1000);
+			session.setServerAliveCountMax(15);
+			logger.debug("Keep-alive interval={}, maxAliveCount={}", session.getServerAliveInterval(), session.getServerAliveCountMax());
 			session.connect();
 			final Channel channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand("~/.xpra/run-xpra _proxy :" + display);
