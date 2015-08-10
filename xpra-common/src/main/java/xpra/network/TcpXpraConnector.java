@@ -65,9 +65,11 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 
 	@Override
 	public void run() {
-		try(Socket socket = new Socket(host, port);
-				InputStream is = socket.getInputStream();
-				OutputStream os = socket.getOutputStream();) {
+		Socket socket = null;
+		try {
+			socket = new Socket(host, port);
+			InputStream is = socket.getInputStream();
+			OutputStream os = socket.getOutputStream();
 			socket.setKeepAlive(true);
 			client.onConnect(new XpraSender(os));
 			fireOnConnectedEvent();
@@ -83,6 +85,9 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 			fireOnConnectionErrorEvent(e);
 		}
 		finally {
+			if(socket != null) try {
+				socket.close();
+			} catch (Exception ignored) {}
 			if(client.getSender() != null) {
 				client.getSender().setClosed(true);
 			}

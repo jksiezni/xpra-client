@@ -26,7 +26,7 @@ public class SshUserInfoHandler implements UserInfo, UIKeyboardInteractive {
 	@Override
 	public boolean promptPassphrase(String message) {
 		try {
-			passwordTask = new CredentialsAskTask(activity.getFragmentManager(), message);
+			passwordTask = new CredentialsAskTask(activity, message);
 			return passwordTask.execute().get();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -42,7 +42,7 @@ public class SshUserInfoHandler implements UserInfo, UIKeyboardInteractive {
 	@Override
 	public boolean promptPassword(String message) {
 		try {
-			passwordTask = new CredentialsAskTask(activity.getFragmentManager(), message);
+			passwordTask = new CredentialsAskTask(activity, message);
 			return passwordTask.execute().get();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -59,7 +59,7 @@ public class SshUserInfoHandler implements UserInfo, UIKeyboardInteractive {
 	public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt,
 			boolean[] echo) {
 		try {
-			passwordTask = new CredentialsAskTask(activity.getFragmentManager(), prompt, echo);
+			passwordTask = new CredentialsAskTask(activity, prompt, echo);
 			boolean success = passwordTask.execute().get();
 			if(success) {
 				return passwordTask.getAnswers();
@@ -73,7 +73,7 @@ public class SshUserInfoHandler implements UserInfo, UIKeyboardInteractive {
 	@Override
 	public boolean promptYesNo(String message) {
 		try {
-			return new YesNoAskTask(activity.getFragmentManager())
+			return new YesNoAskTask(activity)
 			.execute(message)
 			.get();
 		} catch (InterruptedException e) {

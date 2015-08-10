@@ -22,7 +22,7 @@ public abstract class PacketHandler<T extends Packet> {
 	public PacketHandler(Class<T> packetClass) {
 		try {
 			this.data = packetClass.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

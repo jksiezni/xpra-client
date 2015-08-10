@@ -1,5 +1,6 @@
 package com.github.jksiezni.xpra.db.entities;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import xpra.protocol.PictureEncoding;
@@ -8,7 +9,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "connections")
-public class Connection {
+public class Connection implements Serializable {
 
 	@DatabaseField(generatedId = true)
 	private int id;

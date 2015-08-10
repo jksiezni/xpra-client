@@ -30,7 +30,7 @@
         android:layout_height="64dp"
         android:layout_margin="@dimen/spacing_large"
         android:elevation="4dp"
-        tools:src="@drawable/ic_launcher"/>
+        tools:src="@mipmap/ic_launcher"/>
 
     <TextView
         android:id="@+id/connection_name"

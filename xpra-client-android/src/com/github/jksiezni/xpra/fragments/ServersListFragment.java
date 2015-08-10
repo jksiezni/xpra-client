@@ -123,7 +123,7 @@ public class ServersListFragment extends Fragment {
 	
 	protected void editConnection(Connection connection) {
 		getFragmentManager().beginTransaction()
-  		.replace(R.id.container, new ConnectionPrefsFragment(connection))
+  		.replace(R.id.container, ConnectionPrefsFragment.create(connection))
   		.addToBackStack(null)
   		.commit();
 	}

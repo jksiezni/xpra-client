@@ -1,10 +1,5 @@
 package com.github.jksiezni.xpra.fragments;
 
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import xpra.protocol.PictureEncoding;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,14 +26,21 @@ import com.github.jksiezni.xpra.db.entities.ConnectionType;
 import com.github.jksiezni.xpra.preference.PreferenceHelper;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import xpra.protocol.PictureEncoding;
+
 /**
  * @author Jakub Księżniak
  *
  */
 public class ConnectionPrefsFragment extends PreferenceFragment {
 
-	private static final String TEMP_CONN_PREFERENCES = "connection_prefs.tmp";
+	private static final String KEY_CONNECTION = "connection";
 
+	private static final String TEMP_CONN_PREFERENCES = "connection_prefs.tmp";
 	private static final Pattern HOSTNAME_PATTERN = Pattern.compile("^[0-9a-zA-Z_\\-\\.]*$");
 
 	private GlobalActivityAccessor activityAccessor;
@@ -49,14 +51,16 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 
 	public ConnectionPrefsFragment() {
 		setHasOptionsMenu(true);
-		connection = new Connection();
 	}
 
-	public ConnectionPrefsFragment(Connection connection) {
-		this();
-		this.connection = connection;
+	public static ConnectionPrefsFragment create(Connection connection) {
+		final ConnectionPrefsFragment frag = new ConnectionPrefsFragment();
+		final Bundle bundle = new Bundle();
+		bundle.putSerializable(KEY_CONNECTION, connection);
+		frag.setArguments(bundle);
+		return frag;
 	}
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -66,6 +70,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		connection = (Connection) getArguments().getSerializable(KEY_CONNECTION);
 		activityAccessor.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getPreferenceManager().setSharedPreferencesName(TEMP_CONN_PREFERENCES);
 

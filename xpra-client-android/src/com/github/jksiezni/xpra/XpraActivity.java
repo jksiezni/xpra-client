@@ -1,12 +1,5 @@
 package com.github.jksiezni.xpra;
 
-import java.io.File;
-import java.io.IOException;
-
-import xpra.network.SshXpraConnector;
-import xpra.network.TcpXpraConnector;
-import xpra.network.XpraConnector;
-import xpra.network.XpraConnector.ConnectionListener;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +9,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,16 +33,21 @@ import com.github.jksiezni.xpra.ssh.SshUserInfoHandler;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.jcraft.jsch.JSchException;
 
+import java.io.File;
+import java.io.IOException;
+
+import xpra.network.SshXpraConnector;
+import xpra.network.TcpXpraConnector;
+import xpra.network.XpraConnector;
+import xpra.network.XpraConnector.ConnectionListener;
+
 public class XpraActivity extends AppCompatActivity implements OnStackListener,
 	OnNavigationItemSelectedListener, XpraWindowListener {
 
-	private DatabaseHelper database;
-	
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle actionBarDrawer;
 	private NavigationView navigationView;
-	private RelativeLayout xpraLayout;
-	
+
 	private AndroidXpraClient xpraClient;
 	private XpraConnector connector;
 
@@ -60,7 +58,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_xpra);
-		database = OpenHelperManager.getHelper(this, DatabaseHelper.class);
+		DatabaseHelper database = OpenHelperManager.getHelper(this, DatabaseHelper.class);
 
 		// Setup toolbar
 		Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
@@ -85,7 +83,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 		final Connection c = database.getConnectionDao().queryForId(id);
 		
 		// Setup Xpra client
-		xpraLayout = (RelativeLayout) findViewById(R.id.xpraLayout);
+		RelativeLayout xpraLayout = (RelativeLayout) findViewById(R.id.xpraLayout);
 		xpraClient = new AndroidXpraClient(xpraLayout);
 		xpraClient.setPictureEncoding(c.pictureEncoding);
 		xpraClient.setStackListener(this);
@@ -294,7 +292,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 		}
 	}
 	
-	private class ConnectingFragment extends Fragment implements ConnectionListener {
+	public static class ConnectingFragment extends Fragment implements ConnectionListener {
 		private static final int MSG_ERROR = 1;
 		private static final int MSG_CONNECTED = 2;
 		private static final int MSG_DISCONNECTED = 3;
@@ -307,7 +305,8 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 			public boolean handleMessage(Message msg) {
 				switch (msg.what) {
 				case MSG_ERROR:
-					drawerLayout.openDrawer(Gravity.START);
+					XpraActivity activity = (XpraActivity) getActivity();
+					activity.drawerLayout.openDrawer(GravityCompat.START);
 					return true;
 				case MSG_CONNECTED:
 					progressView.setVisibility(View.INVISIBLE);
@@ -336,8 +335,8 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 		@Override
 		public void onViewCreated(View view, Bundle savedInstanceState) {
 			super.onViewCreated(view, savedInstanceState);
-			textView = (TextView) getView().findViewById(R.id.connectionTextView);
-			progressView = getView().findViewById(R.id.progressBar1);
+			textView = (TextView) view.findViewById(R.id.connectionTextView);
+			progressView = view.findViewById(R.id.progressBar1);
 		}
 		
 		@Override
@@ -348,9 +347,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 
 		@Override
 		public void onDisconnected() {
-			if(!isDestroyed()) {
-				handler.obtainMessage(MSG_DISCONNECTED).sendToTarget();
-			}
+			handler.obtainMessage(MSG_DISCONNECTED).sendToTarget();
 		}
 
 		@Override

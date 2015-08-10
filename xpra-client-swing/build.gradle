@@ -6,8 +6,8 @@ sourceCompatibility = 1.7
 
 dependencies {
     compile project(':xpra-common')
-		
-		compile 'org.slf4j:slf4j-simple:1.7.+'
-		
+
+    compile 'org.slf4j:slf4j-simple:1.7.12'
+
     testCompile 'junit:junit:4.+'
 }

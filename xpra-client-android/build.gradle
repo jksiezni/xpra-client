@@ -1,4 +1,4 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     buildToolsVersion "22.0.1"
@@ -19,23 +19,22 @@ android {
 }
 
 repositories {
-	maven { url new File(android.getSdkDirectory(), "extras/android/m2repository") }
+    maven { url new File(android.getSdkDirectory(), "extras/android/m2repository") }
 }
 
 configurations {
 }
 
 dependencies {
-	compile project(':xpra-common')
-	compile 'org.slf4j:slf4j-android:1.7.+'
-	compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile project(':xpra-common')
+    compile 'org.slf4j:slf4j-android:1.7.12'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
 
-	compile 'com.android.support:appcompat-v7:+'
-	compile 'com.android.support:design:+'
-	
-	//compile 'com.android.support:support-v13:+'
-	//compile 'com.android.support:recyclerview-v7:+'
-	//compile 'com.danh32:fontify:1.0-SNAPSHOT'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:design:22.2.1'
+
+    //compile 'com.android.support:support-v13:+'
+    //compile 'com.android.support:recyclerview-v7:+'
 }
 
 // sets up the Android Eclipse project, using the old Ant based build.
@@ -54,7 +53,7 @@ eclipse {
     }
 
     classpath {
-        plusConfigurations += [ project.configurations.compile ]
+        plusConfigurations += [project.configurations.compile]
         containers 'com.android.ide.eclipse.adt.ANDROID_FRAMEWORK', 'com.android.ide.eclipse.adt.LIBRARIES'
     }
 
@@ -68,14 +67,14 @@ eclipse {
         buildCommand "com.android.ide.eclipse.adt.ApkBuilder"
     }
 
-	apply from: "$rootDir/scripts/eclipseAarSupport.gradle"
+    apply from: "$rootDir/scripts/eclipseAarSupport.gradle"
 }
 
 // sets up the Android Idea project, using the old Ant based build.
 idea {
     module {
         sourceDirs += file("src");
-        scopes = [ COMPILE: [plus:[project.configurations.compile]]]
+        scopes = [COMPILE: [plus: [project.configurations.compile]]]
 
         iml {
             withXml {
@@ -85,7 +84,7 @@ idea {
                 builder.component(name: "FacetManager") {
                     facet(type: "android", name: "Android") {
                         configuration {
-                            option(name: "UPDATE_PROPERTY_FILES", value:"true")
+                            option(name: "UPDATE_PROPERTY_FILES", value: "true")
                         }
                     }
                 }
