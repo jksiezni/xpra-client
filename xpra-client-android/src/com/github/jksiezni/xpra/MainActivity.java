@@ -1,5 +1,6 @@
 package com.github.jksiezni.xpra;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -31,6 +32,13 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction().add(R.id.container, new ServersListFragment()).commit();
 		}
+		getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+			@Override
+			public void onBackStackChanged() {
+				shouldDisplayNavigateUp();
+			}
+		});
+		shouldDisplayNavigateUp();
 	}
 
 	@Override
@@ -56,4 +64,13 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 		return floatingButton;
 	}
 
+	@Override
+	public boolean onNavigateUp() {
+		return getFragmentManager().popBackStackImmediate() || super.onNavigateUp();
+	}
+
+	private void shouldDisplayNavigateUp() {
+		final boolean showNavigateUp = getFragmentManager().getBackStackEntryCount() > 0;
+		getSupportActionBar().setDisplayHomeAsUpEnabled(showNavigateUp);
+	}
 }

@@ -199,6 +199,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.xpra_menu, menu);
+		MenuTinter.tintMenuIcons(menu, getResources().getColor(R.color.primaryDarker));
 		return true;
 	}
 
@@ -303,6 +304,9 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 			
 			@Override
 			public boolean handleMessage(Message msg) {
+				if(isDetached()) {
+					return false;
+				}
 				switch (msg.what) {
 				case MSG_ERROR:
 					XpraActivity activity = (XpraActivity) getActivity();

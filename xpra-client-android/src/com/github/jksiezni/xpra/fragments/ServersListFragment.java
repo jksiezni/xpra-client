@@ -116,7 +116,7 @@ public class ServersListFragment extends Fragment {
 
 	protected void newConnection() {
 		getFragmentManager().beginTransaction()
-  		.replace(R.id.container, new ConnectionPrefsFragment())
+  		.replace(R.id.container, ConnectionPrefsFragment.create(new Connection()))
   		.addToBackStack(null)
   		.commit();
 	}

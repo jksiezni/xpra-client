@@ -1,8 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    buildToolsVersion "22.0.1"
-    compileSdkVersion 22
+    buildToolsVersion "23"
+    compileSdkVersion 23
+
+    defaultConfig {
+        minSdkVersion 17
+    }
 
     sourceSets {
         main {
@@ -30,8 +34,8 @@ dependencies {
     compile 'org.slf4j:slf4j-android:1.7.12'
     compile 'com.j256.ormlite:ormlite-android:4.48'
 
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:design:22.2.1'
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:design:23.0.0'
 
     //compile 'com.android.support:support-v13:+'
     //compile 'com.android.support:recyclerview-v7:+'

@@ -27,7 +27,7 @@
     
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
-        <item name="color">@android:color/white</item>
+
     </style>
 
     <color name="accent">#824658</color>

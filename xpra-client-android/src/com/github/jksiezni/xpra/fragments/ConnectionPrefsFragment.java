@@ -19,6 +19,7 @@ import android.view.View.OnClickListener;
 import android.widget.Toast;
 
 import com.github.jksiezni.xpra.GlobalActivityAccessor;
+import com.github.jksiezni.xpra.MenuTinter;
 import com.github.jksiezni.xpra.R;
 import com.github.jksiezni.xpra.XpraActivity;
 import com.github.jksiezni.xpra.db.entities.Connection;
@@ -49,9 +50,6 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 
 	private Connection connection;
 
-	public ConnectionPrefsFragment() {
-		setHasOptionsMenu(true);
-	}
 
 	public static ConnectionPrefsFragment create(Connection connection) {
 		final ConnectionPrefsFragment frag = new ConnectionPrefsFragment();
@@ -59,6 +57,10 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 		bundle.putSerializable(KEY_CONNECTION, connection);
 		frag.setArguments(bundle);
 		return frag;
+	}
+
+	public ConnectionPrefsFragment() {
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -70,12 +72,9 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		connection = (Connection) getArguments().getSerializable(KEY_CONNECTION);
-		activityAccessor.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getPreferenceManager().setSharedPreferencesName(TEMP_CONN_PREFERENCES);
-
-		// setup connection DAO
 		connectionDao = activityAccessor.getHelper().getConnectionDao();
+		connection = (Connection) getArguments().getSerializable(KEY_CONNECTION);
+		getPreferenceManager().setSharedPreferencesName(TEMP_CONN_PREFERENCES);
 
 		final SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
 		if (connection.getId() != 0) {
@@ -93,7 +92,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 
 		// Load the preferences from an XML resource
 		addPreferencesFromResource(R.xml.connection_preferences);
-		setup();
+		setupListeners();
 
 		for (Entry<String, ?> entry : preferences.getAll().entrySet()) {
 			final Preference p = findPreference(entry.getKey());
@@ -109,13 +108,13 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 		FloatingActionButton button = activityAccessor.getFloatingActionButton();
 		button.setImageResource(R.drawable.ic_play_arrow_white_48dp);
 		button.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				if(save()) {
-  				Intent intent = new Intent(getActivity(), XpraActivity.class);
-  				intent.putExtra("connection_id", connection.getId());
-  				startActivity(intent);
+				if (save()) {
+					Intent intent = new Intent(getActivity(), XpraActivity.class);
+					intent.putExtra("connection_id", connection.getId());
+					startActivity(intent);
 				}
 			}
 		});
@@ -124,6 +123,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.connection_edit_menu, menu);
+		MenuTinter.tintMenuIcons(menu, getResources().getColor(R.color.primaryDarker));
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private void setup() {
+	private void setupListeners() {
 		findPreference("name").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter a unique connection name"));
 		findPreference("host").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter the hostname"));
 		findPreference("username").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter your username"));
@@ -259,7 +259,6 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	@Override
 	public void onDestroy() {
 		getPreferenceManager().getSharedPreferences().edit().clear().apply();
-		activityAccessor.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 		super.onDestroy();
 	}
 

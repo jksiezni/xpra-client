@@ -18,13 +18,13 @@ public class Connection implements Serializable {
 	public String name;
 
 	@DatabaseField(canBeNull = false)
-	public ConnectionType type;
+	public ConnectionType type = ConnectionType.TCP;
 
 	@DatabaseField(canBeNull = false)
 	public String host;
 
 	@DatabaseField
-	public int port;
+	public int port = 10000;
 	
 	@DatabaseField(columnName="display_id")
 	public int displayId = -1;
@@ -36,7 +36,7 @@ public class Connection implements Serializable {
 	public String sshPrivateKeyFile;
 	
 	@DatabaseField(columnName="picture_encoding", canBeNull = false)
-	public PictureEncoding pictureEncoding;
+	public PictureEncoding pictureEncoding = PictureEncoding.png;
 	
 	public int getId() {
 		return id;
