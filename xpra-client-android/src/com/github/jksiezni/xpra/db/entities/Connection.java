@@ -10,6 +10,7 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "connections")
 public class Connection implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@DatabaseField(generatedId = true)
 	private int id;
@@ -58,5 +59,22 @@ public class Connection implements Serializable {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		return id > 0 ? id : super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(this == o) {
+			return true;
+		}
+		if(o instanceof Connection) {
+			Connection c = (Connection) o;
+			return c.id > 0 && c.id == id;
+		}
+		return false;
 	}
 }

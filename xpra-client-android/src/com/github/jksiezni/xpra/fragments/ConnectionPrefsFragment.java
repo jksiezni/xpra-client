@@ -38,16 +38,23 @@ import xpra.protocol.PictureEncoding;
  *
  */
 public class ConnectionPrefsFragment extends PreferenceFragment {
-
+	private static final String TEMP_CONN_PREFERENCES = "connection_prefs.tmp";
 	private static final String KEY_CONNECTION = "connection";
 
-	private static final String TEMP_CONN_PREFERENCES = "connection_prefs.tmp";
+	private static final String PREF_CONNECTION_TYPE = "connection_type";
+	private static final String PREF_NAME = "name";
+	private static final String PREF_HOST = "host";
+	private static final String PREF_PORT = "port";
+	private static final String PREF_USERNAME = "username";
+	private static final String PREF_PRIVATE_KEY = "private_keyfile";
+	private static final String PREF_DISPLAY_ID = "display_id";
+	private static final String PREF_PICTURE_ENC = "picture_encoding";
+
 	private static final Pattern HOSTNAME_PATTERN = Pattern.compile("^[0-9a-zA-Z_\\-\\.]*$");
 
 	private GlobalActivityAccessor activityAccessor;
 
 	private RuntimeExceptionDao<Connection, Integer> connectionDao;
-
 	private Connection connection;
 
 
@@ -77,18 +84,16 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 		getPreferenceManager().setSharedPreferencesName(TEMP_CONN_PREFERENCES);
 
 		final SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
-		if (connection.getId() != 0) {
-			preferences.edit()
-				.putString("connection_type", connection.type.toString())
-				.putString("name", connection.name)
-				.putString("host", connection.host)
-				.putString("username", connection.username)
-				.putString("private_keyfile", connection.sshPrivateKeyFile)
-				.putString("port", String.valueOf(connection.port))
-				.putString("display_id", String.valueOf(connection.displayId))
-				.putString("picture_encoding", connection.pictureEncoding.toString())
-				.apply();
-		}
+		preferences.edit()
+			.putString(PREF_CONNECTION_TYPE, connection.type.toString())
+			.putString(PREF_NAME, connection.name)
+			.putString(PREF_HOST, connection.host)
+			.putString(PREF_USERNAME, connection.username)
+			.putString(PREF_PRIVATE_KEY, connection.sshPrivateKeyFile)
+			.putString(PREF_PORT, String.valueOf(connection.port))
+			.putString(PREF_DISPLAY_ID, String.valueOf(connection.displayId))
+			.putString(PREF_PICTURE_ENC, connection.pictureEncoding.toString())
+			.apply();
 
 		// Load the preferences from an XML resource
 		addPreferencesFromResource(R.xml.connection_preferences);
@@ -113,7 +118,7 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 			public void onClick(View v) {
 				if (save()) {
 					Intent intent = new Intent(getActivity(), XpraActivity.class);
-					intent.putExtra("connection_id", connection.getId());
+					intent.putExtra(XpraActivity.EXTRA_CONNECTION_ID, connection.getId());
 					startActivity(intent);
 				}
 			}
@@ -144,11 +149,11 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	}
 	
 	private void setupListeners() {
-		findPreference("name").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter a unique connection name"));
-		findPreference("host").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter the hostname"));
-		findPreference("username").setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter your username"));
-		findPreference("private_keyfile").setOnPreferenceChangeListener(new SimplePreferenceChanger("Choose a private key file"));
-		findPreference("connection_type").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		findPreference(PREF_NAME).setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter a unique connection name"));
+		findPreference(PREF_HOST).setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter the hostname"));
+		findPreference(PREF_USERNAME).setOnPreferenceChangeListener(new SimplePreferenceChanger("Enter your username"));
+		findPreference(PREF_PRIVATE_KEY).setOnPreferenceChangeListener(new SimplePreferenceChanger("Choose a private key file"));
+		findPreference(PREF_CONNECTION_TYPE).setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -166,8 +171,8 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				return true;
 			}
 		});
-		findPreference("port").setOnPreferenceChangeListener(new SimplePreferenceChanger(""));
-		findPreference("display_id").setOnPreferenceChangeListener(new SimplePreferenceChanger("Automatic") {
+		findPreference(PREF_PORT).setOnPreferenceChangeListener(new SimplePreferenceChanger(""));
+		findPreference(PREF_DISPLAY_ID).setOnPreferenceChangeListener(new SimplePreferenceChanger("Automatic") {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				try {
@@ -184,14 +189,14 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				return true;
 			}
 		});
-		ListPreference pictureEncPreference = (ListPreference) findPreference("picture_encoding");
+		final ListPreference pictureEncPreference = (ListPreference) findPreference(PREF_PICTURE_ENC);
 		pictureEncPreference.setEntries(PictureEncoding.toString(PictureEncoding.values()));
 		pictureEncPreference.setEntryValues(PictureEncoding.toString(PictureEncoding.values()));
 		pictureEncPreference.setOnPreferenceChangeListener(new SimplePreferenceChanger(""));
 	}
 
 	protected void setSshPreferencesEnabled(boolean enabled) {
-		final EditTextPreference portPref = (EditTextPreference) findPreference("port");
+		final EditTextPreference portPref = (EditTextPreference) findPreference(PREF_PORT);
 		if(enabled) {
 			if("10000".equals(portPref.getText())) {
 				portPref.setText("22");
@@ -203,8 +208,8 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 				PreferenceHelper.callChangeListener(portPref, portPref.getText());
 			}
 		}
-		findPreference("username").setEnabled(enabled);
-		findPreference("private_keyfile").setEnabled(enabled);
+		findPreference(PREF_USERNAME).setEnabled(enabled);
+		findPreference(PREF_PRIVATE_KEY).setEnabled(enabled);
 	}
 
 	protected boolean validateName(String name) {
@@ -235,21 +240,21 @@ public class ConnectionPrefsFragment extends PreferenceFragment {
 	}
 
 	private boolean validate(SharedPreferences prefs) {
-		final String name = prefs.getString("name", "");
-		final String host = prefs.getString("host", "");
+		final String name = prefs.getString(PREF_NAME, "");
+		final String host = prefs.getString(PREF_HOST, "");
 		return validateName(name) && validateHostname(host);
 	}
 
 	private boolean save() {
 		final SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
 		if (validate(prefs)) {
-			connection.name = prefs.getString("name", null);
-			connection.type = ConnectionType.valueOf(prefs.getString("connection_type", "TCP"));
-			connection.host = prefs.getString("host", null);
-			connection.port = Integer.parseInt(prefs.getString("port", "10000"));
-			connection.username = prefs.getString("username", null);
-			connection.sshPrivateKeyFile = prefs.getString("private_keyfile", null);
-			connection.pictureEncoding = PictureEncoding.decode(prefs.getString("picture_encoding", "png"));
+			connection.name = prefs.getString(PREF_NAME, null);
+			connection.type = ConnectionType.valueOf(prefs.getString(PREF_CONNECTION_TYPE, "TCP"));
+			connection.host = prefs.getString(PREF_HOST, null);
+			connection.port = Integer.parseInt(prefs.getString(PREF_PORT, "10000"));
+			connection.username = prefs.getString(PREF_USERNAME, null);
+			connection.sshPrivateKeyFile = prefs.getString(PREF_PRIVATE_KEY, null);
+			connection.pictureEncoding = PictureEncoding.decode(prefs.getString(PREF_PICTURE_ENC, "png"));
 			connectionDao.createOrUpdate(connection);
 			return true;
 		}

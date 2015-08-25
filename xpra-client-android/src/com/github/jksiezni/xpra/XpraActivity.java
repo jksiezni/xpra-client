@@ -44,6 +44,8 @@ import xpra.network.XpraConnector.ConnectionListener;
 public class XpraActivity extends AppCompatActivity implements OnStackListener,
 	OnNavigationItemSelectedListener, XpraWindowListener {
 
+	public static final String EXTRA_CONNECTION_ID = "connection_id";
+
 	private DrawerLayout drawerLayout;
 	private ActionBarDrawerToggle actionBarDrawer;
 	private NavigationView navigationView;
@@ -79,7 +81,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 			finish();
 			return;
 		}
-		final int id = intent.getIntExtra("connection_id", 0);
+		final int id = intent.getIntExtra(EXTRA_CONNECTION_ID, 0);
 		final Connection c = database.getConnectionDao().queryForId(id);
 		
 		// Setup Xpra client
