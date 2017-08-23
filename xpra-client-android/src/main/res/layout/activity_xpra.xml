@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.github.jksiezni.xpra.XpraActivity" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize" />
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <!-- The main content view -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/contentFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+            <com.github.jksiezni.xpra.views.XYScrollView
+                android:id="@+id/xpraScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/xpraWorkspace"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </com.github.jksiezni.xpra.views.XYScrollView>
+        </FrameLayout>
+
+        <!-- The navigation drawer -->
+        <android.support.design.widget.NavigationView
+	        android:id="@+id/navigation_view"
+	        android:layout_width="wrap_content"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="start"
+	        app:headerLayout="@layout/drawer_header"
+	        app:menu="@menu/windows_drawer"/>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>

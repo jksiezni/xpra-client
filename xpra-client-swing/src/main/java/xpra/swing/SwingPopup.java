@@ -52,6 +52,7 @@ public class SwingPopup extends XpraWindow {
 	@Override
 	public void draw(DrawPacket packet) {
 		canvas.draw(packet);
+		sendDamageSequence(packet, 0);
 	}
 	
 	public SwingWindow<?> getOwner() {

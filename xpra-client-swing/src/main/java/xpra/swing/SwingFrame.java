@@ -60,6 +60,7 @@ public class SwingFrame extends SwingWindow<JFrame> {
 	@Override
 	public void draw(DrawPacket packet) {
 		canvas.draw(packet);
+		sendDamageSequence(packet, 0);
 	}
 
 }

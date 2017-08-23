@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 
-sourceCompatibility = 1.7
+sourceCompatibility = JavaVersion.VERSION_1_7
 
 
 dependencies {
@@ -9,5 +9,5 @@ dependencies {
 
     compile 'org.slf4j:slf4j-simple:1.7.12'
 
-    testCompile 'junit:junit:4.+'
+    testCompile 'junit:junit:4.12'
 }

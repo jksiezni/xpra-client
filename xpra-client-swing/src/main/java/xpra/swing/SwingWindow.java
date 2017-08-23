@@ -47,6 +47,9 @@ public abstract class SwingWindow<T extends Window> extends XpraWindow
 	
 	@Override
 	protected void onIconUpdate(WindowIcon windowIcon) {
+		if(windowIcon.encoding == null) {
+			return;
+		}
 		switch (windowIcon.encoding) {
 		case png:
 		case jpeg:

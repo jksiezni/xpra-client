@@ -1,2 +1,3 @@
-include 'xpra-common', 'bee-encode', 'rencode4j'
-include 'xpra-client-android', 'xpra-client-swing'
+include 'xpra-common'
+include 'xpra-client-swing'
+include 'xpra-client-android'

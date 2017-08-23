@@ -74,6 +74,8 @@ public class SwingDialog extends SwingWindow<JDialog> {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			sendDamageSequence(packet, 0);
 		}
 	}
 	
