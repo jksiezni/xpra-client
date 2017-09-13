@@ -15,42 +15,27 @@
  *     with this program; if not, write to the Free Software Foundation, Inc.,
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package xpra.protocol.packets;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
-public class KeyAction extends WindowPacket {
+public class NewWindowOverrideRedirect extends NewWindow {
 
-	String keyname = "";
-	boolean pressed;
-	List<String> modifiers = new ArrayList<>();
-	int keyval;
-	String name = "";
-	int keycode;
-
-  int group = 0; // added in xpra 2.1
-	
-	public KeyAction(int windowId, int keycode, String keyname, boolean pressed) {
-		super("key-action", windowId);
-		this.keyval = 0;
-		this.keycode = keycode;
-		this.keyname = keyname;
-		this.pressed = pressed;
+	public NewWindowOverrideRedirect() {
+		super("new-override-redirect");
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
-	public void serialize(Collection<Object> elems) {
-		super.serialize(elems);
-		elems.add(keyname);
-		elems.add(pressed);
-		elems.add(modifiers);
-		elems.add(keyval);
-		elems.add(name);
-		elems.add(keycode);
-		elems.add(group); // required by server 2.1
+	public void deserialize(Iterator<Object> iter) {
+		super.deserialize(iter);
+    if(!isOverrideRedirect()) {
+      setOverrideRedirect(true);
+    }
 	}
 
+	private void setOverrideRedirect(boolean enabled) {
+		metadata.put("override-redirect", enabled);
+	}
 }

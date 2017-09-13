@@ -1,8 +1,24 @@
-/**
- * 
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package xpra.network;
 
+package xpra.protocol;
+
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -12,16 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xpra.network.chunks.HeaderChunk;
-import xpra.protocol.packets.Packet;
 
 import com.github.jksiezni.rencode.RencodeOutputStream;
 
-/**
- * @author Jakub Księżniak
- *
- */
-public class XpraSender {
-	static final Logger logger = LoggerFactory.getLogger(XpraSender.class);
+public class XpraSender implements Closeable {
+	private static final Logger logger = LoggerFactory.getLogger(XpraSender.class);
 
 	private final OutputStream outputStream;
 	private final byte[] header = new byte[8];
@@ -43,13 +54,14 @@ public class XpraSender {
 		header[2] = 0;
 	}
 
-	public synchronized void send(Packet packet) {
+	public synchronized void send(IOPacket packet) {
 		if(closed) {
 			logger.warn("Stream closed! Failed to send packet: " + packet.type);
 			return;
 		}
 		try {
 			final ArrayList<Object> list = new ArrayList<>();
+      list.add(packet.type);
 			packet.serialize(list);
 			if (useRencode) {
 				rencoder.writeCollection(list);
@@ -96,8 +108,8 @@ public class XpraSender {
 		this.compressionLevel = compressionLevel;
 	}
 	
-	void setClosed(boolean closed) {
-		this.closed = closed;
-	}
-
+  @Override
+  public void close() throws IOException {
+    this.closed = true;
+  }
 }

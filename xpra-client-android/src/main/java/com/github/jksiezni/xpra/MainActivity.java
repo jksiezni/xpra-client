@@ -23,9 +23,16 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.github.jksiezni.xpra.fragments.ServersListFragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import xpra.protocol.packets.HelloRequest;
+import xpra.protocol.packets.SetDeflate;
 
 public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
 
@@ -55,7 +62,22 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 		shouldDisplayNavigateUp();
 	}
 
-	@Override
+  @Override
+  protected void onResume() {
+    super.onResume();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000000; ++i) {
+            SetDeflate deflate = new SetDeflate(123);
+        }
+        Log.i("bench", "TIme: " + (System.currentTimeMillis()-start));
+      }
+    }).start();
+  }
+
+  @Override
 	protected void onDestroy() {
 		OpenHelperManager.releaseHelper();
 		super.onDestroy();

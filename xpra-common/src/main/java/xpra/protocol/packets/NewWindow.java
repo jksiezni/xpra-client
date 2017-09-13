@@ -1,6 +1,21 @@
-/**
- * 
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package xpra.protocol.packets;
 
 import java.util.Iterator;
@@ -19,13 +34,13 @@ public class NewWindow extends WindowPacket {
 	protected WindowMetadata metadata;
 	
 	public NewWindow() {
-		this(false);
-	}
-	
-	public NewWindow(boolean overrideRedirect) {
-		super(overrideRedirect ? "new-override-redirect" : "new-window");
+		super("new-window");
 	}
 
+	protected NewWindow(String type) {
+    super(type);
+  }
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void deserialize(Iterator<Object> iter) {
@@ -39,20 +54,8 @@ public class NewWindow extends WindowPacket {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder(getClass().getSimpleName());
-		builder.append("( id=");
-		builder.append(windowId);
-		builder.append(", ");
-		builder.append(x);
-		builder.append('x');
-		builder.append(y);
-		builder.append(':');
-		builder.append(width);
-		builder.append('x');
-		builder.append(height);
-		builder.append(", ");
-		builder.append(metadata);
-		return builder.toString();
+		return getClass().getSimpleName() +
+				"( id=" + windowId + ", " + x + 'x' + y + ':' + width + 'x' + height + ", " + metadata + ')';
 	}
 	
 	public int getX() {
@@ -77,9 +80,5 @@ public class NewWindow extends WindowPacket {
 
 	public boolean isOverrideRedirect() {
 		return metadata.getAsBoolean("override-redirect");
-	}
-	
-	public void setOverrideRedirect(boolean enabled) {
-		metadata.put("override-redirect", enabled);
 	}
 }

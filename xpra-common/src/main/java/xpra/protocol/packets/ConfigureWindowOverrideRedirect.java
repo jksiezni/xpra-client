@@ -18,39 +18,10 @@
 
 package xpra.protocol.packets;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+public class ConfigureWindowOverrideRedirect extends ConfigureWindow {
 
-public class KeyAction extends WindowPacket {
-
-	String keyname = "";
-	boolean pressed;
-	List<String> modifiers = new ArrayList<>();
-	int keyval;
-	String name = "";
-	int keycode;
-
-  int group = 0; // added in xpra 2.1
-	
-	public KeyAction(int windowId, int keycode, String keyname, boolean pressed) {
-		super("key-action", windowId);
-		this.keyval = 0;
-		this.keycode = keycode;
-		this.keyname = keyname;
-		this.pressed = pressed;
+	public ConfigureWindowOverrideRedirect() {
+		super("configure-override-redirect");
 	}
 	
-	@Override
-	public void serialize(Collection<Object> elems) {
-		super.serialize(elems);
-		elems.add(keyname);
-		elems.add(pressed);
-		elems.add(modifiers);
-		elems.add(keyval);
-		elems.add(name);
-		elems.add(keycode);
-		elems.add(group); // required by server 2.1
-	}
-
 }

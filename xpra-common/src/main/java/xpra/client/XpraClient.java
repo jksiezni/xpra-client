@@ -1,21 +1,36 @@
-/**
- * 
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package xpra.client;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import xpra.network.XpraSender;
+import xpra.protocol.XpraReceiver;
+import xpra.protocol.XpraSender;
 import xpra.protocol.PictureEncoding;
-import xpra.protocol.packets.ConfigureWindow;
+import xpra.protocol.packets.ConfigureWindowOverrideRedirect;
 import xpra.protocol.packets.CursorPacket;
-import xpra.protocol.packets.DamageSequence;
 import xpra.protocol.packets.DesktopSize;
 import xpra.protocol.packets.Disconnect;
 import xpra.protocol.packets.DrawPacket;
@@ -23,26 +38,26 @@ import xpra.protocol.packets.HelloRequest;
 import xpra.protocol.packets.HelloResponse;
 import xpra.protocol.packets.LostWindow;
 import xpra.protocol.packets.NewWindow;
+import xpra.protocol.packets.NewWindowOverrideRedirect;
 import xpra.protocol.packets.Ping;
 import xpra.protocol.packets.PingEcho;
 import xpra.protocol.packets.RaiseWindow;
 import xpra.protocol.packets.SetDeflate;
+import xpra.protocol.packets.StartupComplete;
 import xpra.protocol.packets.WindowIcon;
 import xpra.protocol.packets.WindowMetadata;
 
-/**
- * @author Jakub Księżniak
- *
- */
 public abstract class XpraClient {
-	static final Logger logger = LoggerFactory.getLogger(XpraClient.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(XpraClient.class);
 	
-	private final Map<String, PacketHandler<?>> handlers = new HashMap<String, PacketHandler<?>>();
-	private final Map<Integer, XpraWindow> windows = new HashMap<Integer, XpraWindow>();
+	private final Map<Integer, XpraWindow> windows = new HashMap<>();
 	
 	private final PictureEncoding[] pictureEncodings;
 	private final XpraKeyboard keyboard;
-	
+
+  private XpraSender sender;
+  private XpraReceiver receiver;
+
 	/* Configuration options. */
 	private PictureEncoding encoding;
 	private int desktopWidth;
@@ -56,8 +71,6 @@ public abstract class XpraClient {
 	 */
 	private boolean disconnectedByServer;
 	
-	private XpraSender sender;
-	
 
 	public XpraClient(int desktopWidth, int desktopHeight, PictureEncoding[] supportedPictureEncodings) {
 		this(desktopWidth, desktopHeight, supportedPictureEncodings, null);
@@ -69,21 +82,22 @@ public abstract class XpraClient {
 		this.pictureEncodings = supportedPictureEncodings;
 		this.encoding = pictureEncodings[0];
 		this.keyboard = keyboard;
+    this.receiver = new XpraReceiver();
 		
 		//  setup packet handlers
-		setHandler(new HelloHandler());
-		setHandler(new PingHandler());
-		setHandler(new PacketHandler<Disconnect>(Disconnect.class) {
+		receiver.registerHandler(HelloResponse.class, new HelloHandler());
+    receiver.registerHandler(Ping.class, new PingHandler());
+    receiver.registerHandler(Disconnect.class, new XpraReceiver.PacketHandler<Disconnect>() {
 			@Override
-			protected void process(Disconnect response) throws IOException {
-				logger.debug("Server disconnected with msg: %s", response.reason);
+			public void process(Disconnect response) throws IOException {
+				LOGGER.debug("Server disconnected with msg: %s", response.reason);
 				disconnectedByServer = true;
 			}
 		});
-		setHandler(new PacketHandler<NewWindow>(NewWindow.class) {
+    receiver.registerHandler(NewWindow.class, new XpraReceiver.PacketHandler<NewWindow>() {
 			@Override
 			public void process(NewWindow response) throws IOException {
-				logger.info("Processing... " + response);
+				LOGGER.info("Processing... " + response);
 				final XpraWindow window = onCreateWindow(response);
 				window.setSender(sender);
 				windows.put(window.getId(), window);
@@ -91,13 +105,10 @@ public abstract class XpraClient {
 				onWindowStarted(window);
 			}
 		});
-		setHandler(new PacketHandler<NewWindow>(new NewWindow(true)) {
+    receiver.registerHandler(NewWindowOverrideRedirect.class, new XpraReceiver.PacketHandler<NewWindowOverrideRedirect>() {
 			@Override
-			public void process(NewWindow response) throws IOException {
-				logger.info("Processing... " + response);
-				if(!response.isOverrideRedirect()) {
-					response.setOverrideRedirect(true);
-				}
+			public void process(NewWindowOverrideRedirect response) throws IOException {
+				LOGGER.info("Processing... " + response);
 				final XpraWindow window = onCreateWindow(response);
 				window.setSender(sender);
 				windows.put(window.getId(), window);
@@ -105,34 +116,33 @@ public abstract class XpraClient {
 				onWindowStarted(window);
 			}
 		});
-		setHandler(new PacketHandler<SetDeflate>(SetDeflate.class) {
+    receiver.registerHandler(SetDeflate.class, new XpraReceiver.PacketHandler<SetDeflate>() {
 			@Override
-			protected void process(SetDeflate response) throws IOException {
+			public void process(SetDeflate response) throws IOException {
 				sender.setCompressionLevel(response.compressionLevel);
 			}
 		});
-		setHandler(new PacketHandler<DrawPacket>(DrawPacket.class) {
+    receiver.registerHandler(DrawPacket.class, new XpraReceiver.PacketHandler<DrawPacket>() {
 			@Override
-			protected void process(DrawPacket drawing) throws IOException {
-				final long start = System.currentTimeMillis();
-				XpraWindow xpraWindow = windows.get(drawing.getWindowId());
+			public void process(DrawPacket packet) throws IOException {
+				final XpraWindow xpraWindow = windows.get(packet.getWindowId());
 				if(xpraWindow != null) {
-					xpraWindow.draw(drawing);
-				}
-				if (drawing.packet_sequence >= 0) {
-          sender.send(new DamageSequence(drawing, System.currentTimeMillis()-start));
+					xpraWindow.draw(packet);
+				} else {
+					LOGGER.error("Missing window when handling: " + packet);
+					//XpraWindow.sendDamageSequence(sender, packet, 0);
 				}
 			}
 		});
-		setHandler(new PacketHandler<WindowMetadata>(WindowMetadata.class) {
+    receiver.registerHandler(WindowMetadata.class, new XpraReceiver.PacketHandler<WindowMetadata>() {
 			@Override
-			protected void process(WindowMetadata meta) throws IOException {
+			public void process(WindowMetadata meta) throws IOException {
 				windows.get(meta.getWindowId()).onMetadataUpdate(meta);
 			}
 		});
-		setHandler(new PacketHandler<LostWindow>(LostWindow.class) {
+    receiver.registerHandler(LostWindow.class, new XpraReceiver.PacketHandler<LostWindow>() {
 			@Override
-			protected void process(LostWindow response) throws IOException {
+			public void process(LostWindow response) throws IOException {
 				final XpraWindow window = windows.remove(response.getWindowId());
 				if(window != null) {
 					window.onStop();
@@ -140,40 +150,38 @@ public abstract class XpraClient {
 				}
 			}
 		});
-		setHandler(new PacketHandler<CursorPacket>(CursorPacket.class) {
+    receiver.registerHandler(CursorPacket.class, this::onCursorUpdate);
+    receiver.registerHandler(WindowIcon.class, new XpraReceiver.PacketHandler<WindowIcon>() {
 			@Override
-			protected void process(CursorPacket response) throws IOException {
-				onCursorUpdate(response);
-			}
-		});
-		setHandler(new PacketHandler<WindowIcon>(WindowIcon.class) {
-			@Override
-			protected void process(WindowIcon response) throws IOException {
+			public void process(WindowIcon response) throws IOException {
 				XpraWindow window = getWindow(response.getWindowId());
 				if(window != null) {
 					window.onIconUpdate(response);
 				}
 			}
 		});
-		setHandler(new PacketHandler<ConfigureWindow>(new ConfigureWindow("configure-override-redirect")) {
+		receiver.registerHandler(ConfigureWindowOverrideRedirect.class,
+        new XpraReceiver.PacketHandler<ConfigureWindowOverrideRedirect>() {
 			@Override
-			protected void process(ConfigureWindow response) throws IOException {
+			public void process(ConfigureWindowOverrideRedirect response) throws IOException {
 				XpraWindow window = windows.get(response.getWindowId());
 				if(window != null) {
 					window.onMoveResize(response);
 				}
 			}
 		});
-		setHandler(new PacketHandler<RaiseWindow>(RaiseWindow.class) {
+    receiver.registerHandler(RaiseWindow.class, new XpraReceiver.PacketHandler<RaiseWindow>() {
 			@Override
-			protected void process(RaiseWindow response) throws IOException {
-				logger.info("raise-window: " + response.getWindowId());
+      public void process(RaiseWindow response) throws IOException {
+				LOGGER.info("raise-window: " + response.getWindowId());
 			}
 		});
-	}
-	
-	protected final void setHandler(PacketHandler<?> handler) {
-		handlers.put(handler.getType(), handler);
+    receiver.registerHandler(StartupComplete.class, new XpraReceiver.PacketHandler<StartupComplete>() {
+      @Override
+      public void process(StartupComplete response) throws IOException {
+        LOGGER.info(response.toString());
+      }
+    });
 	}
 	
 	/**
@@ -208,7 +216,7 @@ public abstract class XpraClient {
 	}
 
 	protected void onCursorUpdate(CursorPacket cursorPacket) {
-		logger.info(cursorPacket.toString());		
+		LOGGER.info(cursorPacket.toString());
 	}
 
 	public void onConnect(XpraSender sender) {
@@ -228,30 +236,9 @@ public abstract class XpraClient {
 	}
 		
 	public void onConnectionError(IOException e) {
-		logger.error("connection error", e);
+		LOGGER.error("connection error", e);
 	}
 	
-	public final void onPacketReceived(List<Object> packetList) throws IOException {
-		if (packetList.size() < 1) {
-			logger.error("processPacket(..) decoded data is too small: " + packetList);
-			return;
-		}
-		
-		final Object rawType = packetList.get(0);
-		if(!(rawType instanceof byte[])) {
-			logger.error("processPacket(..) Expected byte[] object, but got: " + rawType);
-			return;
-		}
-		final String type = new String((byte[]) rawType);
-		if(handlers.containsKey(type)) {
-			handlers.get(type).onResponse(packetList);
-		} else {
-			logger.error("Not supported packet type: " + type);
-			System.err.println(packetList);
-			System.exit(1);
-		}
-	}
-
 	public XpraSender getSender() {
 		return sender;
 	}
@@ -264,7 +251,7 @@ public abstract class XpraClient {
 		this.desktopWidth = width;
 		this.desktopHeight = height;
 		if(sender != null) {
-			sender.send(new DesktopSize(1280, 800));
+			sender.send(new DesktopSize(width, height));
 		}
 	}
 	
@@ -275,30 +262,25 @@ public abstract class XpraClient {
 	public void setPictureEncoding(PictureEncoding pictureEncoding) {
 		this.encoding = pictureEncoding;
 	}
-	
-	
-	private class HelloHandler extends PacketHandler<HelloResponse> {
+
+  public void onPacketReceived(List<Object> list) throws IOException {
+    receiver.onReceive(list);
+  }
+
+
+  private class HelloHandler implements XpraReceiver.PacketHandler<HelloResponse> {
 
 		private final SetDeflate setDeflate = new SetDeflate(3);
 		
-		public HelloHandler() {
-			super(new HelloResponse());
-		}
-
 		@Override
 		public void process(HelloResponse response) throws IOException {
-			logger.debug(response.toString());
-			logger.debug("Server caps: " + response.getCaps().toString());
+			LOGGER.debug(response.toString());
 			sender.useRencode(response.isRencode());
 			sender.send(setDeflate);
 		}
 	}
 	
-	private class PingHandler extends PacketHandler<Ping> {
-		
-		public PingHandler() {
-			super(new Ping());
-		}
+	private class PingHandler implements XpraReceiver.PacketHandler<Ping> {
 		
 		@Override
 		public void process(Ping response) throws IOException {

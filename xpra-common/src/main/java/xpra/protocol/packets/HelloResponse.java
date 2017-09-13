@@ -1,27 +1,34 @@
-/**
- * 
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package xpra.protocol.packets;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Jakub Księżniak
- *
- */
-public class HelloResponse extends Packet {
+
+public class HelloResponse extends xpra.protocol.Packet {
 	
 	private Map<String, Object> capabilities;
 
-	public HelloResponse() {
-		super("hello");
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void deserialize(Iterator<Object> iter) {
@@ -51,12 +58,10 @@ public class HelloResponse extends Packet {
 	
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder(getClass().getSimpleName());
-		builder.append(": ");
-		builder.append("encodings.allowed=");
-		builder.append(getStringArray("encodings.allowed"));
-		builder.append(", encodings=");
-		builder.append(getStringArray("encodings"));
-		return builder.toString();
+		return getClass().getSimpleName() + ": "
+				+ "encodings.allowed=" + getStringArray("encodings.allowed")
+				+ ", encodings=" + getStringArray("encodings")
+				+ ", root-window-size=" + capabilities.get("root_window_size")
+				+ ", All caps: " + capabilities.keySet();
 	}
 }

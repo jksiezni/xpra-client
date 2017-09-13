@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package xpra.network;
 
 import java.io.IOException;
@@ -20,8 +38,6 @@ import com.jcraft.jsch.UserInfo;
 
 /**
  * An SSH connector to Xpra Server.
- * @author Jakub Księżniak
- *
  */
 public class SshXpraConnector extends XpraConnector implements Runnable {
 	static final Logger logger = LoggerFactory.getLogger(SshXpraConnector.class);
@@ -95,7 +111,7 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 	}
 
 	private boolean disconnectCleanly() {
-		final XpraSender s = client.getSender();
+		final xpra.protocol.XpraSender s = client.getSender();
 		if(s != null) {
 			s.send(new Disconnect());
 			return true;
@@ -120,14 +136,13 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 			channel.connect();
 
 			final InputStream in = channel.getInputStream();
-			client.onConnect(new XpraSender(channel.getOutputStream()));
+			client.onConnect(new xpra.protocol.XpraSender(channel.getOutputStream()));
 			fireOnConnectedEvent();
 			StreamChunk reader = new HeaderChunk();
 			logger.info("Start Xpra connection...");
 			while (!Thread.interrupted() && !client.isDisconnectedByServer()) {
 				reader = reader.readChunk(in, this);
 			}
-			logger.info("Finnished Xpra connection!");
 		} catch (JSchException e) {
 			client.onConnectionError(new IOException(e));
 			fireOnConnectionErrorEvent(new IOException(e));
@@ -135,9 +150,10 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 			client.onConnectionError(e);
 			fireOnConnectionErrorEvent(e);
 		} finally {
-			if(client.getSender() != null) {
-				client.getSender().setClosed(true);
-			}
+      logger.info("Finnished Xpra connection!");
+			if(client.getSender() != null) try {
+          client.getSender().close();
+      } catch (IOException ignore) {}
 			if (session != null) {
 				session.disconnect();
 			}

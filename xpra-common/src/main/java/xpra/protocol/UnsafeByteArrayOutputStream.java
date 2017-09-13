@@ -16,41 +16,22 @@
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package xpra.protocol.packets;
+package xpra.protocol;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
 
-public class KeyAction extends WindowPacket {
+class UnsafeByteArrayOutputStream extends ByteArrayOutputStream {
 
-	String keyname = "";
-	boolean pressed;
-	List<String> modifiers = new ArrayList<>();
-	int keyval;
-	String name = "";
-	int keycode;
-
-  int group = 0; // added in xpra 2.1
-	
-	public KeyAction(int windowId, int keycode, String keyname, boolean pressed) {
-		super("key-action", windowId);
-		this.keyval = 0;
-		this.keycode = keycode;
-		this.keyname = keyname;
-		this.pressed = pressed;
+	public UnsafeByteArrayOutputStream(int initialSize) {
+		super(initialSize);
 	}
 	
-	@Override
-	public void serialize(Collection<Object> elems) {
-		super.serialize(elems);
-		elems.add(keyname);
-		elems.add(pressed);
-		elems.add(modifiers);
-		elems.add(keyval);
-		elems.add(name);
-		elems.add(keycode);
-		elems.add(group); // required by server 2.1
+	/**
+	 * Returns an internal bytes data. Use {@link #size()} method to get the size of actual data in the buffer.
+	 * @return a byte array
+	 */
+	public byte[] getBytes() {
+		return buf;
 	}
-
+	
 }

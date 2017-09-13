@@ -297,7 +297,7 @@ public class AndroidXpraWindow extends XpraWindow implements OnTouchListener, On
 		}
 
 		public void postDraw(DrawPacket packet) {
-			getHandler().obtainMessage(MSG_DRAW, packet.clone()).sendToTarget();
+			getHandler().obtainMessage(MSG_DRAW, packet).sendToTarget();
 		}
 
 		@Override

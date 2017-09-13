@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 /**
  * 
  */
@@ -16,10 +34,6 @@ import xpra.network.chunks.HeaderChunk;
 import xpra.network.chunks.StreamChunk;
 import xpra.protocol.packets.Disconnect;
 
-/**
- * @author Jakub Księżniak
- *
- */
 public class TcpXpraConnector extends XpraConnector implements Runnable {
 	static final Logger logger = LoggerFactory.getLogger(TcpXpraConnector.class);
 	
@@ -55,7 +69,7 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 	}
 
 	private boolean disconnectCleanly() {
-		final XpraSender s = client.getSender();
+		final xpra.protocol.XpraSender s = client.getSender();
 		if(s != null) {
 			s.send(new Disconnect());
 			return true;
@@ -71,7 +85,7 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 			socket.setKeepAlive(true);
-			client.onConnect(new XpraSender(os));
+			client.onConnect(new xpra.protocol.XpraSender(os));
 			fireOnConnectedEvent();
 			
 			StreamChunk reader = new HeaderChunk();
@@ -87,10 +101,10 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 		finally {
 			if(socket != null) try {
 				socket.close();
-			} catch (Exception ignored) {}
-			if(client.getSender() != null) {
-				client.getSender().setClosed(true);
-			}
+        if(client.getSender() != null) {
+          client.getSender().close();
+        }
+      } catch (Exception ignored) {}
 			client.onDisconnect();
 			fireOnDisconnectedEvent();
 		}

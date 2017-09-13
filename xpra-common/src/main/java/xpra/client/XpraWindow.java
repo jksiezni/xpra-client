@@ -1,11 +1,27 @@
-/**
- * 
+/*
+ * Copyright (C) 2017 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package xpra.client;
 
-import xpra.network.XpraSender;
+import xpra.protocol.XpraSender;
 import xpra.protocol.packets.CloseWindow;
 import xpra.protocol.packets.ConfigureWindow;
+import xpra.protocol.packets.DamageSequence;
 import xpra.protocol.packets.DrawPacket;
 import xpra.protocol.packets.FocusRequest;
 import xpra.protocol.packets.KeyAction;
@@ -17,10 +33,6 @@ import xpra.protocol.packets.UnmapWindow;
 import xpra.protocol.packets.WindowIcon;
 import xpra.protocol.packets.WindowMetadata;
 
-/**
- * @author Jakub Księżniak
- *
- */
 public abstract class XpraWindow {
 
 	private final int id;
@@ -68,6 +80,16 @@ public abstract class XpraWindow {
 	}
 
 	public abstract void draw(DrawPacket packet);
+
+	protected void sendDamageSequence(DrawPacket packet, long frameTime) {
+		sendDamageSequence(sender, packet, frameTime);
+	}
+
+	static void sendDamageSequence(XpraSender sender, DrawPacket packet, long frameTime) {
+		if (packet.packet_sequence >= 0) {
+			sender.send(new DamageSequence(packet, frameTime));
+		}
+	}
 
 	protected void setFocused(boolean focused) {
 		if(focused) {
