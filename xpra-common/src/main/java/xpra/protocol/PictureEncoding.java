@@ -19,6 +19,8 @@
 package xpra.protocol;
 
 public enum PictureEncoding {
+  rgb24,
+  premult_argb32,
 	jpeg,
 	png,
 	pngP("png/P"),
@@ -47,7 +49,7 @@ public enum PictureEncoding {
 				return encoding;
 			}
 		}
-		return null;
+		throw new IllegalArgumentException("Unsupported picture encoding: " + code);
 	}
 
 	public static String[] toString(PictureEncoding[] encodings) {

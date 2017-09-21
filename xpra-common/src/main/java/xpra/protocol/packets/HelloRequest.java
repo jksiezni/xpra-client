@@ -33,7 +33,7 @@ import xpra.protocol.ProtocolConstants;
 
 public class HelloRequest extends xpra.protocol.IOPacket {
 
-	public final Map<String, Object> caps = new LinkedHashMap<String, Object>();
+	private final Map<String, Object> caps = new LinkedHashMap<>();
 
 	public HelloRequest(int screenWidth, int screenHeight, XpraKeyboard keyboard, PictureEncoding defaultEncoding, PictureEncoding[] encodings) {
 		super("hello");
@@ -49,6 +49,7 @@ public class HelloRequest extends xpra.protocol.IOPacket {
 		caps.put("client_type", "Java");
 		caps.put("screen_sizes", new int[][] { screenDims });
 		caps.put("encodings", PictureEncoding.toString(encodings));
+		caps.put("zlib", true);
 		caps.put("clipboard", false);
 		caps.put("notifications", true);
 		caps.put("cursors", true);
@@ -74,7 +75,7 @@ public class HelloRequest extends xpra.protocol.IOPacket {
 //		caps.put("dpi.y", ydpi);		
 	}
 
-	public void setKeyboard(XpraKeyboard keyboard) {
+	private void setKeyboard(XpraKeyboard keyboard) {
 		if (keyboard != null) {
 			caps.put("keyboard", true);
 			caps.put("keyboard_sync", false);
