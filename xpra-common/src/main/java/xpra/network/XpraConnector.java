@@ -79,7 +79,7 @@ public abstract class XpraConnector {
 		}
 	}
 
-  public void onPacketReceived(List<Object> list) throws IOException {
+  protected void onPacketReceived(List<Object> list) throws IOException {
     client.onPacketReceived(list);
   }
 

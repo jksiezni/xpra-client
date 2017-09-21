@@ -27,7 +27,7 @@ import org.ardverk.coding.BencodingOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xpra.network.chunks.HeaderChunk;
+import xpra.network.HeaderChunk;
 
 import com.github.jksiezni.rencode.RencodeOutputStream;
 
@@ -35,7 +35,7 @@ public class XpraSender implements Closeable {
 	private static final Logger logger = LoggerFactory.getLogger(XpraSender.class);
 
 	private final OutputStream outputStream;
-	private final byte[] header = new byte[8];
+	private final HeaderChunk headerChunk = new HeaderChunk();
 
 	private final UnsafeByteArrayOutputStream byteStream = new UnsafeByteArrayOutputStream(4096);
 	private final BencodingOutputStream bencoder = new BencodingOutputStream(byteStream);
@@ -49,9 +49,6 @@ public class XpraSender implements Closeable {
 
 	public XpraSender(OutputStream os) {
 		this.outputStream = os;
-		header[0] = 'P';
-		header[1] = 0;
-		header[2] = 0;
 	}
 
 	public synchronized void send(IOPacket packet) {
@@ -65,10 +62,10 @@ public class XpraSender implements Closeable {
 			packet.serialize(list);
 			if (useRencode) {
 				rencoder.writeCollection(list);
-				header[1] = HeaderChunk.FLAG_RENCODE;
+        headerChunk.setFlags(HeaderChunk.FLAG_RENCODE);
 			} else {
 				bencoder.writeCollection(list);
-				header[1] = 0;
+        headerChunk.setFlags(0);
 			}
 			logger.info("send(" + list + ")");
 
@@ -85,13 +82,10 @@ public class XpraSender implements Closeable {
 //				deflater.reset();
 			}
 			
-			header[4] = (byte) ((packetSize >>> 24) & 0xFF);
-			header[5] = (byte) ((packetSize >>> 16) & 0xFF);
-			header[6] = (byte) ((packetSize >>> 8) & 0xFF);
-			header[7] = (byte) (packetSize & 0xFF);
+			headerChunk.setPacketSize(packetSize);
 
 			logger.debug("send(): payload size is " + packetSize + " bytes");
-			outputStream.write(header);
+      headerChunk.writeHeader(outputStream);
 			outputStream.write(bytes, 0, packetSize);
 			outputStream.flush();
 			byteStream.reset();

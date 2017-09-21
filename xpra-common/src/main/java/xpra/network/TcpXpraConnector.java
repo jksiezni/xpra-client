@@ -16,26 +16,22 @@
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-/**
- * 
- */
 package xpra.network;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xpra.client.XpraClient;
-import xpra.network.chunks.HeaderChunk;
-import xpra.network.chunks.StreamChunk;
 import xpra.protocol.packets.Disconnect;
 
 public class TcpXpraConnector extends XpraConnector implements Runnable {
-	static final Logger logger = LoggerFactory.getLogger(TcpXpraConnector.class);
+	private static final Logger logger = LoggerFactory.getLogger(TcpXpraConnector.class);
 	
 	private final String host;
 	private final int port;
@@ -88,10 +84,11 @@ public class TcpXpraConnector extends XpraConnector implements Runnable {
 			client.onConnect(new xpra.protocol.XpraSender(os));
 			fireOnConnectedEvent();
 			
-			StreamChunk reader = new HeaderChunk();
+			PacketReader reader = new PacketReader(is);
 			logger.info("Start Xpra connection...");
 			while(!Thread.interrupted() && !client.isDisconnectedByServer()) {
-				reader = reader.readChunk(is, this);
+        List<Object> dp = reader.readList();
+        onPacketReceived(dp);
 			}
 			logger.info("Finnished Xpra connection!");
 		} catch (IOException e) {

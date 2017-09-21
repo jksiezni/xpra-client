@@ -20,13 +20,12 @@ package xpra.network;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xpra.client.XpraClient;
-import xpra.network.chunks.HeaderChunk;
-import xpra.network.chunks.StreamChunk;
 import xpra.protocol.packets.Disconnect;
 
 import com.jcraft.jsch.Channel;
@@ -40,7 +39,7 @@ import com.jcraft.jsch.UserInfo;
  * An SSH connector to Xpra Server.
  */
 public class SshXpraConnector extends XpraConnector implements Runnable {
-	static final Logger logger = LoggerFactory.getLogger(SshXpraConnector.class);
+	private static final Logger logger = LoggerFactory.getLogger(SshXpraConnector.class);
 
 	private final JSch jsch = new JSch();
 
@@ -138,10 +137,11 @@ public class SshXpraConnector extends XpraConnector implements Runnable {
 			final InputStream in = channel.getInputStream();
 			client.onConnect(new xpra.protocol.XpraSender(channel.getOutputStream()));
 			fireOnConnectedEvent();
-			StreamChunk reader = new HeaderChunk();
+			PacketReader reader = new PacketReader(in);
 			logger.info("Start Xpra connection...");
 			while (!Thread.interrupted() && !client.isDisconnectedByServer()) {
-				reader = reader.readChunk(in, this);
+        List<Object> dp = reader.readList();
+        onPacketReceived(dp);
 			}
 		} catch (JSchException e) {
 			client.onConnectionError(new IOException(e));
