@@ -57,9 +57,9 @@ class ChunkInflaterInputStream extends InflaterInputStream {
       if (len > buf.length) {
         len = buf.length;
       }
-      len = read(buf, 0, len);
-      if (len == -1) {
-        break;
+      len = in.read(buf, 0, len);
+      if (len < 0) {
+        throw new EOFException("Unexpected end of input stream");
       }
       toRead -= len;
     }

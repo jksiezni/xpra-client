@@ -18,8 +18,6 @@
 
 package xpra.network;
 
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -41,7 +39,7 @@ class PatchChunk {
       while (bytesRead < packetSize) {
         final int r = is.read(buffer, bytesRead, packetSize - bytesRead);
         if (r < 0) {
-          throw new EOFException("Unexpected end of stream: " + is);
+          throw new EOFException("Unexpected end of stream");
         }
         bytesRead += r;
       }
@@ -50,13 +48,13 @@ class PatchChunk {
 	}
 	
 	private byte[] readCompressed(InputStream in, int packetSize) throws IOException {
+    inflater.reset();
     ChunkInflaterInputStream inCompressed = new ChunkInflaterInputStream(in, inflater, packetSize);
     ByteArrayOutputStream output = new ByteArrayOutputStream(packetSize);
 		while(inCompressed.available() > 0) {
 			final int r = inCompressed.read(buffer, 0, buffer.length);
 			if(r < 0) {
-        LoggerFactory.getLogger(getClass()).warn("readCompressed(): EOS");
-				break;
+        throw new EOFException("Unexpected end of stream");
 			}
 			output.write(buffer, 0, r);
 		}

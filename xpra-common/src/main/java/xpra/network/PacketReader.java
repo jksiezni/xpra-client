@@ -73,6 +73,7 @@ class PacketReader {
       list = readBencodedList(input);
     }
     if (headerChunk.isDataCompressed()) {
+      // fixme remove this code
       ((ChunkInflaterInputStream)input).drain();
     }
     for(Map.Entry<Integer, byte[]> entry : patches.entrySet()) {

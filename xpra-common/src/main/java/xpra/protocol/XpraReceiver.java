@@ -88,7 +88,6 @@ public class XpraReceiver {
   		process(packet);
     } else {
       logger.error("Not supported packet: " + type + ": " + dp);
-      System.exit(1);
     }
   }
 

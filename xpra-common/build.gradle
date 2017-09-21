@@ -8,7 +8,7 @@ dependencies {
     compile 'com.github.jksiezni:bee-encode:0.3'
     compile 'com.github.jksiezni:rencode4j:1.2.0'
 
-    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'com.jcraft:jsch:0.1.52'
 
     testCompile 'junit:junit:4.12'

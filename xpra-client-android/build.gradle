@@ -18,11 +18,14 @@ android {
 
 dependencies {
     compile project(':xpra-common')
-    compile 'org.slf4j:slf4j-android:1.7.12'
+
+    compile 'eu.lp0.slf4j:slf4j-android:1.7.25-0'
     compile 'com.j256.ormlite:ormlite-android:4.48'
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
 
     compile 'ch.acra:acra:4.6.2'
+
+    testCompile 'junit:junit:4.12'
 }

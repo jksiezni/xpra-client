@@ -59,11 +59,6 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 	}
 
 	public void draw(DrawPacket packet) {
-		if(packet.encoding != PictureEncoding.png
-				&& packet.encoding != PictureEncoding.pngL
-				&& packet.encoding != PictureEncoding.pngP) {
-			throw new RuntimeException("Invalid encoding: " + packet.encoding);
-		}
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(packet.data));
 			Graphics2D g = (Graphics2D) getBufferStrategy().getDrawGraphics();
@@ -73,8 +68,7 @@ public class XpraCanvas extends Canvas implements HierarchyListener, MouseListen
 			g.dispose();
 			getBufferStrategy().show();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+      throw new RuntimeException("Failed decoding image: " + packet.encoding, e);
 		}
 	}
 	

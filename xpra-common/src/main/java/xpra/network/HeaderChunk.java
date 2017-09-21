@@ -59,7 +59,7 @@ public class HeaderChunk {
       }
       headerRead += bytesRead;
     }
-    LOGGER.trace("Header received: " + toString() + ", size=" + getPacketSize());
+    LOGGER.trace("Header received {} size={}", toString(), getPacketSize());
     if(header[0] != MAGIC_BYTE) {
       throw new IOException("Bad header. expected=80, received=" + header[0]);
     }
