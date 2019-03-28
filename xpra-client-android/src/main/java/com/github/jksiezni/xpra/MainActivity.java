@@ -28,10 +28,12 @@ import android.util.Log;
 import com.github.jksiezni.xpra.fragments.ServersListFragment;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+//import java.lang.reflect.Constructor;
+//import java.lang.reflect.InvocationTargetException;
 
-import xpra.protocol.packets.HelloRequest;
+//import xpra.protocol.packets.HelloRequest;
+import java.util.Objects;
+
 import xpra.protocol.packets.SetDeflate;
 
 public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
@@ -44,9 +46,10 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 		setContentView(R.layout.activity_main);
 
 		// Set the custom toolbar
-		final Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+		final Toolbar toolbar;
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+		Objects.requireNonNull(getSupportActionBar()).setLogo(R.mipmap.ic_launcher);
 		
 		floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
 
@@ -102,6 +105,6 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 
 	private void shouldDisplayNavigateUp() {
 		final boolean showNavigateUp = getFragmentManager().getBackStackEntryCount() > 0;
-		getSupportActionBar().setDisplayHomeAsUpEnabled(showNavigateUp);
+		Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(showNavigateUp);
 	}
 }
