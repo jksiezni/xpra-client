@@ -38,7 +38,7 @@ import xpra.protocol.packets.SetDeflate;
 
 public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
 
-	private FloatingActionButton floatingButton;
+	private FloatingActionButton floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +50,8 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 		Objects.requireNonNull(getSupportActionBar()).setLogo(R.mipmap.ic_launcher);
-		
-		floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
 
-		if (savedInstanceState == null) {
+        if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction().add(R.id.container, new ServersListFragment()).commit();
 		}
 		getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
