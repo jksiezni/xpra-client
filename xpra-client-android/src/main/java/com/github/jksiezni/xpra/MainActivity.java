@@ -21,6 +21,7 @@ package com.github.jksiezni.xpra;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -38,7 +39,14 @@ import xpra.protocol.packets.SetDeflate;
 
 public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
 
-	private FloatingActionButton floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
+	/**
+	 *
+	 */
+	private FloatingActionButton floatingButton;
+
+	public MainActivity() {
+		floatingButton = findViewById(R.id.floatingButton);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +54,8 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 		setContentView(R.layout.activity_main);
 
 		// Set the custom toolbar
-		final Toolbar toolbar;
-        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(toolbar);
+		final Toolbar toolbar = this.findViewById(R.id.my_toolbar);
+		setSupportActionBar(toolbar);
 		Objects.requireNonNull(getSupportActionBar()).setLogo(R.mipmap.ic_launcher);
 
         if (savedInstanceState == null) {
@@ -100,8 +107,9 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 
 	private void shouldDisplayNavigateUp() {
 		final boolean showNavigateUp;
-		if (getFragmentManager().getBackStackEntryCount() > 0) showNavigateUp = true;
-		else showNavigateUp = false;
+		if (getFragmentManager().getBackStackEntryCount() > 0) {
+			showNavigateUp = true;
+		} else showNavigateUp = false;
 		Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(showNavigateUp);
 	}
 }
