@@ -18,6 +18,7 @@
 
 package com.github.jksiezni.xpra;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -326,6 +327,7 @@ public class XpraActivity extends AppCompatActivity implements OnStackListener,
 		
 		final Handler handler = new Handler(new Handler.Callback() {
 			
+			@SuppressLint("SetTextI18n")
 			@Override
 			public boolean handleMessage(Message msg) {
 				if(isDetached()) {

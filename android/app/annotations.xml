@@ -1,0 +1,6 @@
+<root>
+    <item
+        name='android.app.FragmentManager void addOnBackStackChangedListener(android.app.FragmentManager.OnBackStackChangedListener)'>
+        <annotation name='java.lang.Deprecated' />
+    </item>
+</root>

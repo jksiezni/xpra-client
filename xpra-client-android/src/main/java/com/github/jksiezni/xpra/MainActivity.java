@@ -66,16 +66,13 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
   @Override
   protected void onResume() {
     super.onResume();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 1000000; ++i) {
-            SetDeflate deflate = new SetDeflate(123);
-        }
-        Log.i("bench", "TIme: " + (System.currentTimeMillis()-start));
-      }
-    }).start();
+    new Thread(() -> {
+	  long start = System.currentTimeMillis();
+	  for (int i = 0; i < 1000000; ++i) {
+		  SetDeflate deflate = new SetDeflate(123);
+	  }
+	  Log.i("bench", "TIme: " + (System.currentTimeMillis()-start));
+	}).start();
   }
 
   @Override
@@ -102,7 +99,9 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 	}
 
 	private void shouldDisplayNavigateUp() {
-		final boolean showNavigateUp = getFragmentManager().getBackStackEntryCount() > 0;
+		final boolean showNavigateUp;
+		if (getFragmentManager().getBackStackEntryCount() > 0) showNavigateUp = true;
+		else showNavigateUp = false;
 		Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(showNavigateUp);
 	}
 }
