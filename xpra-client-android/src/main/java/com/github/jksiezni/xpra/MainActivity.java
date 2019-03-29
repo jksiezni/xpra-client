@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements GlobalActivityAcc
 	private FloatingActionButton floatingButton;
 
 	public MainActivity() {
+		setContentView(R.layout.activity_main);
 		floatingButton = findViewById(R.id.floatingButton);
 	}
 
