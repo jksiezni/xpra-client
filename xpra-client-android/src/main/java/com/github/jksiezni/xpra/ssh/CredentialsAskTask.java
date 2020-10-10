@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.github.jksiezni.xpra.ssh;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +30,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.jksiezni.xpra.R;
-import com.github.jksiezni.xpra.UiTask;
+
+import androidx.appcompat.app.AlertDialog;
 
 final class CredentialsAskTask extends UiTask<Void, Boolean> {
 
@@ -117,8 +117,8 @@ final class CredentialsAskTask extends UiTask<Void, Boolean> {
             final LayoutInflater inflater = LayoutInflater.from(context);
             for (int i = 0; i < prompt.length; ++i) {
                 final View credentialsView = inflater.inflate(R.layout.credentials_item, layout);
-                final TextView promptView = (TextView) credentialsView.findViewById(R.id.promptTextView);
-                final EditText editView = (EditText) credentialsView.findViewById(R.id.passwdEditText);
+                final TextView promptView = credentialsView.findViewById(R.id.promptTextView);
+                final EditText editView = credentialsView.findViewById(R.id.passwdEditText);
                 promptView.setText(prompt[i]);
                 credentialsView.setTag(prompt[i]);
                 if (echo[i]) {
@@ -143,8 +143,8 @@ final class CredentialsAskTask extends UiTask<Void, Boolean> {
                 if (!echo[i]) {
                     EditText passEditText = getPasswordEditText(i);
                     passEditText.setInputType(show ?
-                            (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
-                            : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
+                        : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     passEditText.setSelection(passEditText.length());
                 }
             }

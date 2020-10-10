@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -31,54 +31,54 @@ import static org.junit.Assert.fail;
 
 public class HeaderChunkTest {
 
-  private static final byte FLAGS = HeaderChunk.FLAG_RENCODE;
-  private static final byte COMPRESSION_LVL = 1;
-  private static final byte PACKET_INDEX = 2;
+    private static final byte FLAGS = HeaderChunk.FLAG_RENCODE;
+    private static final byte COMPRESSION_LVL = 1;
+    private static final byte PACKET_INDEX = 2;
 
-  private static final byte[] HEADER = {'P', FLAGS, COMPRESSION_LVL, PACKET_INDEX, 0, 0, 0, 3};
+    private static final byte[] HEADER = {'P', FLAGS, COMPRESSION_LVL, PACKET_INDEX, 0, 0, 0, 3};
 
-  private HeaderChunk headerChunk = new HeaderChunk();
+    private HeaderChunk headerChunk = new HeaderChunk();
 
-  @Test
-  public void testReadHeader() throws IOException {
-    headerChunk.readHeader(new ByteArrayInputStream(HEADER));
+    @Test
+    public void testReadHeader() throws IOException {
+        headerChunk.readHeader(new ByteArrayInputStream(HEADER));
 
-    assertEquals(FLAGS, headerChunk.getFlags());
-    assertEquals(COMPRESSION_LVL, headerChunk.getCompressionLevel());
-    assertEquals(PACKET_INDEX, headerChunk.getPacketIndex());
-    assertEquals(3, headerChunk.getPacketSize());
-  }
-
-  @Test
-  public void testInvalidHeader_incomplete() {
-    try {
-      headerChunk.readHeader(new ByteArrayInputStream(new byte[1]));
-      fail("Incomplete header");
-    } catch (IOException e) {
-      // everything is OK
+        assertEquals(FLAGS, headerChunk.getFlags());
+        assertEquals(COMPRESSION_LVL, headerChunk.getCompressionLevel());
+        assertEquals(PACKET_INDEX, headerChunk.getPacketIndex());
+        assertEquals(3, headerChunk.getPacketSize());
     }
-  }
 
-  @Test
-  public void testInvalidHeader_noMagicByte() {
-    try {
-      headerChunk.readHeader(new ByteArrayInputStream(new byte[8]));
-      fail("Header should start with a magic byte");
-    } catch (IOException e) {
-      // everything is OK
+    @Test
+    public void testInvalidHeader_incomplete() {
+        try {
+            headerChunk.readHeader(new ByteArrayInputStream(new byte[1]));
+            fail("Incomplete header");
+        } catch (IOException e) {
+            // everything is OK
+        }
     }
-  }
 
-  @Test
-  public void testWriteHeader() throws IOException {
-    headerChunk.setFlags(FLAGS);
-    headerChunk.setCompressionLevel(COMPRESSION_LVL);
-    headerChunk.setPacketIndex(PACKET_INDEX);
-    headerChunk.setPacketSize(3);
+    @Test
+    public void testInvalidHeader_noMagicByte() {
+        try {
+            headerChunk.readHeader(new ByteArrayInputStream(new byte[8]));
+            fail("Header should start with a magic byte");
+        } catch (IOException e) {
+            // everything is OK
+        }
+    }
 
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    headerChunk.writeHeader(out);
-    assertArrayEquals(HEADER, out.toByteArray());
-  }
+    @Test
+    public void testWriteHeader() throws IOException {
+        headerChunk.setFlags(FLAGS);
+        headerChunk.setCompressionLevel(COMPRESSION_LVL);
+        headerChunk.setPacketIndex(PACKET_INDEX);
+        headerChunk.setPacketSize(3);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        headerChunk.writeHeader(out);
+        assertArrayEquals(HEADER, out.toByteArray());
+    }
 
 }

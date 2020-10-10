@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package xpra.protocol.packets;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +30,12 @@ import java.util.TreeMap;
 public class WindowMetadata extends WindowPacket {
 	public static final int NO_PARENT = -1;
 
+	public static final String META_TITLE = "title";
+
 	private final Map<String, Object> meta;
 	
 	public WindowMetadata() {
-		this(0, new HashMap<String, Object>());
+		this(0, new HashMap<>());
 	}
 	
 	public WindowMetadata(int windowId, Map<String, Object> meta) {
@@ -108,6 +111,7 @@ public class WindowMetadata extends WindowPacket {
 		}
 		return NO_PARENT;
 	}
+
 	public Integer getAsInt(String key) {
 		final Object value = meta.get(key);
 		if(value != null) {
@@ -115,4 +119,25 @@ public class WindowMetadata extends WindowPacket {
 		}
 		return null;
 	}
+
+	public EnumSet<WindowType> getWindowTypes() {
+    final EnumSet<WindowType> types = EnumSet.noneOf(WindowType.class);
+	  final Object value = meta.get("window-type");
+    if (value != null) {
+      List<String> list = asStringList(value);
+
+      for (String elem : list) {
+        types.add(WindowType.valueOf(elem));
+      }
+    }
+    return types;
+  }
+
+    public String getTitle() {
+        return getAsString(META_TITLE);
+    }
+
+    public enum WindowType {
+	  DROPDOWN_MENU, POPUP_MENU, NORMAL
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,57 +22,65 @@ import java.util.Iterator;
 
 public class CursorPacket extends xpra.protocol.Packet {
 
-	private boolean empty;
-	
-	public int x;
-	public int y;
-	public int width;
-	public int height;
-	public int xHotspot;
-	public int yHotspot;
-	public int serial;
-	public byte[] pixels;
+    private boolean empty;
 
-	public String name;
-	
-	@Override
-	public void deserialize(Iterator<Object> iter) {
-		super.deserialize(iter);
-		Object first = iter.next();
-		if(first instanceof byte[] && asString(first).isEmpty()) {
-			empty = true;
-			return; // empty cursor
-		}
-		empty = false;
-		x = asInt(first);
-		y = asInt(iter.next());
-		width = asInt(iter.next());
-		height = asInt(iter.next());
-		xHotspot = asInt(iter.next());
-		yHotspot = asInt(iter.next());
-		serial = asInt(iter.next());
-		pixels = asByteArray(iter.next());
+    public String encoding;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public int xHotspot;
+    public int yHotspot;
+    public int serial;
+    public byte[] pixels;
 
-		if(iter.hasNext()) {
-			// named cursor
-			name = asString(iter.next());
-		}
-	}
-	
-	public boolean isEmpty() {
-		return empty;
-	}
+    public String name;
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder(getClass().getSimpleName());
-		builder.append(": ");
-		if(isEmpty()) {
-			builder.append("empty");
-		} else {
-			builder.append("name=" + name);
-			builder.append(" pixels.length=" + pixels.length);
-		}
-		return  builder.toString();
-	}
+    @Override
+    public void deserialize(Iterator<Object> iter) {
+        super.deserialize(iter);
+        Object first = iter.next();
+        if (first instanceof byte[]) {
+            encoding = asString(first);
+            if (encoding.isEmpty()) {
+                empty = true;
+                return; // empty cursor
+            }
+            first = iter.next();
+        } else {
+            // old xpra server sent only raw cursor data
+            encoding = "raw";
+        }
+        empty = false;
+        x = asInt(first);
+        y = asInt(iter.next());
+        width = asInt(iter.next());
+        height = asInt(iter.next());
+        xHotspot = asInt(iter.next());
+        yHotspot = asInt(iter.next());
+        serial = asInt(iter.next());
+        pixels = asByteArray(iter.next());
+
+        if (iter.hasNext()) {
+            // named cursor
+            name = asString(iter.next());
+        }
+    }
+
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder(getClass().getSimpleName());
+        builder.append(": ");
+        if (isEmpty()) {
+            builder.append("empty");
+        } else {
+            builder.append("name=").append(name);
+            builder.append(" pixels.length=").append(pixels.length);
+        }
+        return builder.toString();
+    }
 }

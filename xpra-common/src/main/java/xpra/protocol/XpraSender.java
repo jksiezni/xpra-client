@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.ardverk.coding.BencodingOutputStream;
 import org.slf4j.Logger;
@@ -31,79 +33,110 @@ import xpra.network.HeaderChunk;
 
 import com.github.jksiezni.rencode.RencodeOutputStream;
 
-public class XpraSender implements Closeable {
-	private static final Logger logger = LoggerFactory.getLogger(XpraSender.class);
+public final class XpraSender implements Closeable {
+    private static final Logger logger = LoggerFactory.getLogger(XpraSender.class);
 
-	private final OutputStream outputStream;
-	private final HeaderChunk headerChunk = new HeaderChunk();
+    private final OutputStream outputStream;
 
-	private final UnsafeByteArrayOutputStream byteStream = new UnsafeByteArrayOutputStream(4096);
-	private final BencodingOutputStream bencoder = new BencodingOutputStream(byteStream);
-	private final RencodeOutputStream rencoder = new RencodeOutputStream(byteStream);
-	
-	//private final Deflater deflater = new Deflater();
+    private final SendWorker sendWorker;
+    //private final Deflater deflater = new Deflater();
 
-	private boolean closed = false;
-	private boolean useRencode = false;
-	private int compressionLevel = 0;
+    private boolean useRencode = false;
+    private int compressionLevel = 0;
 
-	public XpraSender(OutputStream os) {
-		this.outputStream = os;
-	}
+    public XpraSender(OutputStream os) {
+        this.outputStream = os;
+        this.sendWorker = new SendWorker();
+        this.sendWorker.setDaemon(true);
+        this.sendWorker.start();
+    }
 
-	public synchronized void send(IOPacket packet) {
-		if(closed) {
-			logger.warn("Stream closed! Failed to send packet: " + packet.type);
-			return;
-		}
-		try {
-			final ArrayList<Object> list = new ArrayList<>();
-      list.add(packet.type);
-			packet.serialize(list);
-			if (useRencode) {
-				rencoder.writeCollection(list);
-        headerChunk.setFlags(HeaderChunk.FLAG_RENCODE);
-			} else {
-				bencoder.writeCollection(list);
-        headerChunk.setFlags(0);
-			}
-			logger.info("send(" + list + ")");
+    public synchronized void send(IOPacket packet) {
+        if (!sendWorker.isAlive()) {
+            logger.warn("Stream closed! Failed to send packet: " + packet.type);
+            return;
+        }
+        final ArrayList<Object> list = new ArrayList<>();
+        list.add(packet.type);
+        packet.serialize(list);
+        sendWorker.queue.offer(list);
+    }
 
-			final byte[] bytes = byteStream.getBytes();
-			final int packetSize = byteStream.size();
-			
-			// compress data when enabled
-			if (compressionLevel > 0) {
-				// currently we do not need to use a compressed data
+    public void useRencode(boolean enabled) {
+        this.useRencode = enabled;
+    }
+
+    public void setCompressionLevel(int compressionLevel) {
+        this.compressionLevel = compressionLevel;
+    }
+
+    @Override
+    public void close() throws IOException {
+        sendWorker.interrupt();
+        try {
+            sendWorker.join();
+        } catch (InterruptedException e) {
+            // unused
+        }
+    }
+
+    private class SendWorker extends Thread {
+
+        private final HeaderChunk headerChunk = new HeaderChunk();
+
+        private final UnsafeByteArrayOutputStream byteStream = new UnsafeByteArrayOutputStream(4096);
+        private final BencodingOutputStream bencoder = new BencodingOutputStream(byteStream);
+        private final RencodeOutputStream rencoder = new RencodeOutputStream(byteStream);
+
+        private final BlockingQueue<ArrayList> queue = new LinkedBlockingQueue<>();
+
+        @Override
+        public void run() {
+            try {
+                while (!Thread.interrupted()) {
+                    ArrayList list = queue.take();
+                    send(list);
+                }
+            } catch (InterruptedException e) {
+                logger.debug("Finished sender thread.");
+            }
+
+        }
+
+        private void send(ArrayList list) {
+            try {
+                if (useRencode) {
+                    rencoder.writeCollection(list);
+                    headerChunk.setFlags(HeaderChunk.FLAG_RENCODE);
+                } else {
+                    bencoder.writeCollection(list);
+                    headerChunk.setFlags(0);
+                }
+                logger.trace("send(" + list + ")");
+
+                final byte[] bytes = byteStream.getBytes();
+                final int packetSize = byteStream.size();
+
+                // compress data when enabled
+                if (compressionLevel > 0) {
+                    // currently we do not need to use a compressed data
 //				header[1] |= HeaderChunk.FLAG_ZLIB;
 //				deflater.setLevel(compressionLevel);
 //				deflater.setInput(bytes, 0, packetSize);
 //				deflater.deflate(b, off, len);
 //				deflater.reset();
-			}
-			
-			headerChunk.setPacketSize(packetSize);
+                }
 
-			logger.debug("send(): payload size is " + packetSize + " bytes");
-      headerChunk.writeHeader(outputStream);
-			outputStream.write(bytes, 0, packetSize);
-			outputStream.flush();
-			byteStream.reset();
-		} catch (IOException e) {
-			logger.error("Failed to send packet: " + packet.type, e);
-		}
-	}
+                headerChunk.setPacketSize(packetSize);
 
-	public void useRencode(boolean enabled) {
-		this.useRencode = enabled;
-	}
-
-	public void setCompressionLevel(int compressionLevel) {
-		this.compressionLevel = compressionLevel;
-	}
-	
-  @Override
-  public void close() throws IOException {
-    this.closed = true;
-  }
+                logger.trace("send(): payload size is " + packetSize + " bytes");
+                headerChunk.writeHeader(outputStream);
+                outputStream.write(bytes, 0, packetSize);
+                outputStream.flush();
+                byteStream.reset();
+            } catch (IOException e) {
+                logger.error("Failed to send packet: " + list.get(0), e);
+            }
+        }
+    }
 }

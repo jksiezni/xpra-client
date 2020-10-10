@@ -1,55 +1,39 @@
+<!--
+  ~ Copyright (C) 2020 Jakub Ksiezniak
+  ~
+  ~     This program is free software; you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation; either version 2 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License along
+  ~     with this program; if not, write to the Free Software Foundation, Inc.,
+  ~     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.github.jksiezni.xpra.XpraActivity" >
+    tools:context=".client.XpraActivity" >
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/my_toolbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize" />
 
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
+    <TextureView
+        android:id="@+id/xpraView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <!-- The main content view -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:id="@+id/contentFrame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <com.github.jksiezni.xpra.views.XYScrollView
-                android:id="@+id/xpraScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <RelativeLayout
-                    android:id="@+id/xpraWorkspace"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </com.github.jksiezni.xpra.views.XYScrollView>
-        </FrameLayout>
-
-        <!-- The navigation drawer -->
-        <android.support.design.widget.NavigationView
-	        android:id="@+id/navigation_view"
-	        android:layout_width="wrap_content"
-	        android:layout_height="match_parent"
-	        android:layout_gravity="start"
-	        app:headerLayout="@layout/drawer_header"
-	        app:menu="@menu/windows_drawer"/>
-
-    </android.support.v4.widget.DrawerLayout>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

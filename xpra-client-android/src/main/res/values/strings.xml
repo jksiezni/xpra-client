@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2020 Jakub Ksiezniak
+  ~
+  ~     This program is free software; you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation; either version 2 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License along
+  ~     with this program; if not, write to the Free Software Foundation, Inc.,
+  ~     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
 <resources>
 
     <string name="app_name">Xpra Client</string>
     <string name="action_add">Add</string>
-    <string name="connection_type_tcp">TCP connection</string>
-    <string name="connection_type_ssh">SSH connection</string>
-    
-    <string name="title_activity_xpra">XpraActivity</string>
-    
-    <string name="action_settings">Settings</string>
-    
-    <string name="drawer_open">Open drawer</string>
-    
-    <string name="drawer_close">Close drawer</string>
+    <string name="connection_type">Connection type</string>
+
+    <string name="connected_to">Connected to %s</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="channel_name">Xpra Connection Channel</string>
+    <string name="save">save</string>
+    <string name="delete">delete</string>
+    <string name="title_server_name">Server Name</string>
+    <string name="enter_unique_name">Enter a unique name</string>
+    <string name="connecting">Connecting…</string>
+    <string name="picture_encoding">Picture Encoding</string>
+    <string name="advanced">Advanced</string>
+    <string name="automatic">Automatic</string>
+    <string name="edit">edit</string>
+    <string name="start">start</string>
+    <string name="no_connections_label">You have no Xpra connections defined.</string>
+    <string name="open">open</string>
+    <string name="exit">exit</string>
+    <string name="keyboard">keyboard</string>
+    <string name="already_connected">A single connection is supported now.</string>
 
 </resources>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2020 Jakub Ksiezniak
+  ~
+  ~     This program is free software; you can redistribute it and/or modify
+  ~     it under the terms of the GNU General Public License as published by
+  ~     the Free Software Foundation; either version 2 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU General Public License along
+  ~     with this program; if not, write to the Free Software Foundation, Inc.,
+  ~     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+  -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="General settings">
+
+        <EditTextPreference
+            android:inputType="text"
+            android:key="name"
+            android:summary="@string/enter_unique_name"
+            android:title="@string/title_server_name" />
+
+        <ListPreference
+            android:entries="@array/connection_type_names"
+            android:entryValues="@array/connection_type_values"
+            android:key="connection_type"
+            android:title="@string/connection_type"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Connection setup">
+        <EditTextPreference
+            android:inputType="text"
+            android:key="host"
+            android:summary="Enter the hostname"
+            android:title="Hostname" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="port"
+            android:title="Port"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="display_id"
+            android:summary="Automatic"
+            android:title="Display ID" />
+
+        <PreferenceCategory
+            android:title="SSH Connection">
+            <EditTextPreference
+                android:key="username"
+                android:summary="Enter your username"
+                android:title="SSH Username" />
+            <Preference
+                android:key="private_keyfile"
+                android:summary="Choose a private key file"
+                android:title="SSH Private key" />
+        </PreferenceCategory>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/advanced">
+        <ListPreference
+            android:key="picture_encoding"
+            app:useSimpleSummaryProvider="true"
+            android:title="@string/picture_encoding"
+            android:entries="@array/picture_encoding_names"
+            android:entryValues="@array/picture_encoding_values"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

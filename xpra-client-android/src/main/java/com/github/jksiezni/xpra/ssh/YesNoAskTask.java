@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -21,9 +21,8 @@ package com.github.jksiezni.xpra.ssh;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.support.v7.app.AlertDialog;
 
-import com.github.jksiezni.xpra.UiTask;
+import androidx.appcompat.app.AlertDialog;
 
 class YesNoAskTask extends UiTask<String, Boolean> {
 

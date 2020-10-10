@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -45,65 +45,66 @@ import xpra.protocol.packets.WindowMetadata;
 /**
  *
  */
-
 public class XpraReceiver {
-  private static final Logger logger = LoggerFactory.getLogger(XpraReceiver.class);
-  private static final Map<String, Builder<Packet>> PACKETS_MAP = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(XpraReceiver.class);
+    private static final Map<String, Builder<Packet>> PACKETS_MAP = new HashMap<>();
 
-  private final Map<Class<?>, PacketHandler<?>> handlers = new HashMap<>();
+    private final Map<Class<?>, PacketHandler<?>> handlers = new HashMap<>();
 
-  static {
-    PACKETS_MAP.put("hello", HelloResponse::new);
-    PACKETS_MAP.put("cursor", CursorPacket::new);
-    PACKETS_MAP.put("ping", Ping::new);
-    PACKETS_MAP.put("startup-complete", StartupComplete::new);
-    PACKETS_MAP.put("disconnect", Disconnect::new);
-    PACKETS_MAP.put("new-window", NewWindow::new);
-    PACKETS_MAP.put("new-override-redirect", NewWindowOverrideRedirect::new);
-    PACKETS_MAP.put("set_deflate", SetDeflate::new);
-    PACKETS_MAP.put("draw", DrawPacket::new);
-    PACKETS_MAP.put("window-metadata", WindowMetadata::new);
-    PACKETS_MAP.put("lost-window", LostWindow::new);
-    PACKETS_MAP.put("window-icon", WindowIcon::new);
-    PACKETS_MAP.put("configure-override-redirect", ConfigureWindowOverrideRedirect::new);
-    PACKETS_MAP.put("raise-window", RaiseWindow::new);
-  }
-
-  public <T extends Packet> void registerHandler(Class<T> packetClass, PacketHandler<T> handler) {
-    handlers.put(packetClass, handler);
-  }
-
-  public void onReceive(List<Object> dp) throws IOException {
-    if (dp.size() < 1) {
-      logger.error("onReceive(..) decoded data is too small: " + dp);
-      return;
+    static {
+        PACKETS_MAP.put("hello", HelloResponse::new);
+        PACKETS_MAP.put("cursor", CursorPacket::new);
+        PACKETS_MAP.put("ping", Ping::new);
+        PACKETS_MAP.put("startup-complete", StartupComplete::new);
+        PACKETS_MAP.put("disconnect", Disconnect::new);
+        PACKETS_MAP.put("new-window", NewWindow::new);
+        PACKETS_MAP.put("new-override-redirect", NewWindowOverrideRedirect::new);
+        PACKETS_MAP.put("set_deflate", SetDeflate::new);
+        PACKETS_MAP.put("draw", DrawPacket::new);
+        PACKETS_MAP.put("window-metadata", WindowMetadata::new);
+        PACKETS_MAP.put("lost-window", LostWindow::new);
+        PACKETS_MAP.put("window-icon", WindowIcon::new);
+        PACKETS_MAP.put("configure-override-redirect", ConfigureWindowOverrideRedirect::new);
+        PACKETS_MAP.put("raise-window", RaiseWindow::new);
+        //PACKETS_MAP.put("notify_show", NotifyShow::new);
     }
 
-    Iterator<Object> it = dp.iterator();
-    String type = Packet.asString(it.next());
-    Builder<Packet> builder = PACKETS_MAP.get(type);
-    if (builder != null) {
-      Packet packet = builder.build();
-      packet.deserialize(it);
-  		process(packet);
-    } else {
-      logger.error("Not supported packet: " + type + ": " + dp);
+    public <T extends Packet> void registerHandler(Class<T> packetClass, PacketHandler<T> handler) {
+        handlers.put(packetClass, handler);
     }
-  }
 
-  @SuppressWarnings("unchecked")
-  private void process(Packet packet) throws IOException {
-    PacketHandler handler = (PacketHandler) handlers.get(packet.getClass());
-    handler.process(packet);
-  }
+    public void onReceive(List<Object> dp) throws IOException {
+        if (dp.size() < 1) {
+            logger.error("onReceive(..) decoded data is too small: " + dp);
+            return;
+        }
 
-  private interface Builder<T> {
+        Iterator<Object> it = dp.iterator();
+        String type = Packet.asString(it.next());
+        Builder<Packet> builder = PACKETS_MAP.get(type);
+        if (builder != null) {
+            Packet packet = builder.build();
+            packet.deserialize(it);
+            logger.trace("onReceive(): " + packet);
+            process(packet);
+        } else {
+            logger.error("Not supported packet: " + type + ": " + dp);
+        }
+    }
 
-    T build();
-  }
+    @SuppressWarnings("unchecked")
+    private void process(Packet packet) throws IOException {
+        PacketHandler handler = handlers.get(packet.getClass());
+        handler.process(packet);
+    }
 
-  public interface PacketHandler<T extends Packet> {
+    private interface Builder<T> {
 
-    void process(T packet) throws IOException;
-  }
+        T build();
+    }
+
+    public interface PacketHandler<T extends Packet> {
+
+        void process(T packet) throws IOException;
+    }
 }

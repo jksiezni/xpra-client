@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -24,41 +24,40 @@ import java.util.Locale;
 
 public interface XpraKeyboard {
 
-	Locale getLocale();
+    Locale getLocale();
 
-	List<KeyDesc> getKeycodes();
+    List<KeyDesc> getKeycodes();
 
-	/**
-	 * Key descriptor.
-	 * 
-	 */
-	public static class KeyDesc {
-		
-		int keyval;
-		String keyname = "";
-		int keycode;
-		int group;
-		int level;
-		
-		public KeyDesc(int keycode, String keyname) {
-			this.keyval = keycode;
-			this.keycode = keycode;
-			this.keyname = keyname;
-		}
+    /**
+     * Key descriptor.
+     */
+    class KeyDesc {
 
-		public List<Object> toList() {
-			final List<Object> list = new ArrayList<>(5);
-			list.add(keyval);
-			list.add(keyname);
-			list.add(keycode);
-			list.add(group);
-			list.add(level);
-			return list;
-		}
-		
-		@Override
-		public String toString() {
-			return getClass().getSimpleName() + "( " + keycode + ", " + keyname + ")";
-		}
-	}
+        int keyval;
+        String keyname = "";
+        int keycode;
+        int group;
+        int level;
+
+        public KeyDesc(int keycode, String keyname) {
+            this.keyval = keycode;
+            this.keycode = keycode;
+            this.keyname = keyname;
+        }
+
+        public List<Object> toList() {
+            final List<Object> list = new ArrayList<>(5);
+            list.add(keyval);
+            list.add(keyname);
+            list.add(keycode);
+            list.add(group);
+            list.add(level);
+            return list;
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "( " + keycode + ", " + keyname + ")";
+        }
+    }
 }

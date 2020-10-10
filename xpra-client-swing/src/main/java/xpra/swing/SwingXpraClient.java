@@ -1,5 +1,23 @@
+/*
+ * Copyright (C) 2020 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 /**
- * 
+ *
  */
 package xpra.swing;
 
@@ -31,18 +49,18 @@ import xpra.swing.keyboard.SimpleXpraKeyboard;
  */
 public class SwingXpraClient extends XpraClient {
 
-	private static final PictureEncoding[] PICTURE_ENCODINGS = {PictureEncoding.pngP, PictureEncoding.png, PictureEncoding.jpeg};
-	
-	private static int getDesktopWidth() {
-		return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
-	}
-	
-	private static int getDesktopHeight() {
-		return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
-	}
+    private static final PictureEncoding[] PICTURE_ENCODINGS = {PictureEncoding.pngP, PictureEncoding.png, PictureEncoding.jpeg};
 
-	public SwingXpraClient() {
-		super(getDesktopWidth(), getDesktopHeight(), PICTURE_ENCODINGS, new SimpleXpraKeyboard());
+    private static int getDesktopWidth() {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
+    }
+
+    private static int getDesktopHeight() {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+    }
+
+    public SwingXpraClient() {
+        super(getDesktopWidth(), getDesktopHeight(), PICTURE_ENCODINGS, new SimpleXpraKeyboard());
 //		System.out.println(GraphicsEnvironment.getLocalGraphicsEnvironment()
 //				.getDefaultScreenDevice()
 //				.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT));
@@ -52,57 +70,57 @@ public class SwingXpraClient extends XpraClient {
 //		System.out.println(GraphicsEnvironment.getLocalGraphicsEnvironment()
 //				.getDefaultScreenDevice()
 //				.isWindowTranslucencySupported(WindowTranslucency.PERPIXEL_TRANSPARENT));
-	}
+    }
 
-	@Override
-	protected XpraWindow onCreateWindow(NewWindow wnd) {
-		if(wnd.isOverrideRedirect()) {
-			final XpraWindow owner = getWindow(wnd.getMetadata().getParentId());
-			if(owner instanceof SwingPopup) {
-				return new SwingPopup(wnd, ((SwingPopup)owner).getOwner());
-			} else {
-				return new SwingPopup(wnd, (SwingWindow<?>) owner);
-			}
-		} else {
-			return new SwingFrame(wnd);
-		}
-	}
+    @Override
+    protected XpraWindow onCreateWindow(NewWindow wnd) {
+        if (wnd.isOverrideRedirect()) {
+            final XpraWindow owner = getWindow(wnd.getMetadata().getParentId());
+            if (owner instanceof SwingPopup) {
+                return new SwingPopup(wnd, ((SwingPopup) owner).getOwner());
+            } else {
+                return new SwingPopup(wnd, (SwingWindow<?>) owner);
+            }
+        } else {
+            return new SwingFrame(wnd);
+        }
+    }
 
-	@Override
-	protected void onCursorUpdate(CursorPacket cursorPacket) {
-		super.onCursorUpdate(cursorPacket);
-		if(cursorPacket.isEmpty()) {
-			return;
-		}
-		int width = cursorPacket.width;
-		int height = cursorPacket.height;
-		
-		ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
-    int[] nBits = {8, 8, 8, 8};
-    int[] bOffs = {1, 2, 3, 0};
-    ColorModel colorModel = new ComponentColorModel(cs, nBits, true, true,
-                                         Transparency.TRANSLUCENT,
-                                         DataBuffer.TYPE_BYTE);
-    WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-                                            width, height,
-                                            width*4, 4,
-                                            bOffs, null);
-    
-		BufferedImage img = new BufferedImage(colorModel, raster, true, null);
-		img.getRaster().setDataElements(0, 0, width, height, cursorPacket.pixels);
-		
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension size = toolkit.getBestCursorSize(width, height);
-		Point hotspot = new Point(cursorPacket.xHotspot, cursorPacket.yHotspot);
-		Image outputImg = img;
-		if(size.width != width || size.height != height) {
-			outputImg = img.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
-			hotspot.x = hotspot.x * size.width / width;
-			hotspot.y = hotspot.y * size.height / height;
-		}
-		
-		Cursor c = toolkit.createCustomCursor(outputImg, hotspot, "test");
-		SwingFrame window = (SwingFrame) getWindow(1);
-		window.window.setCursor(c);
-	}
+    @Override
+    protected void onCursorUpdate(CursorPacket cursorPacket) {
+        super.onCursorUpdate(cursorPacket);
+        if (cursorPacket.isEmpty()) {
+            return;
+        }
+        int width = cursorPacket.width;
+        int height = cursorPacket.height;
+
+        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_sRGB);
+        int[] nBits = {8, 8, 8, 8};
+        int[] bOffs = {1, 2, 3, 0};
+        ColorModel colorModel = new ComponentColorModel(cs, nBits, true, true,
+            Transparency.TRANSLUCENT,
+            DataBuffer.TYPE_BYTE);
+        WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
+            width, height,
+            width * 4, 4,
+            bOffs, null);
+
+        BufferedImage img = new BufferedImage(colorModel, raster, true, null);
+        img.getRaster().setDataElements(0, 0, width, height, cursorPacket.pixels);
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension size = toolkit.getBestCursorSize(width, height);
+        Point hotspot = new Point(cursorPacket.xHotspot, cursorPacket.yHotspot);
+        Image outputImg = img;
+        if (size.width != width || size.height != height) {
+            outputImg = img.getScaledInstance(size.width, size.height, Image.SCALE_SMOOTH);
+            hotspot.x = hotspot.x * size.width / width;
+            hotspot.y = hotspot.y * size.height / height;
+        }
+
+        Cursor c = toolkit.createCustomCursor(outputImg, hotspot, "test");
+        SwingFrame window = (SwingFrame) getWindow(1);
+        window.window.setCursor(c);
+    }
 }

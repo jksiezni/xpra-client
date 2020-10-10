@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,20 +23,25 @@ import java.util.Iterator;
 
 /**
  * @author Jakub Księżniak
- *
  */
 public class Ping extends xpra.protocol.Packet {
-	
-	private long timestamp;
 
-  @Override
-  protected void deserialize(Iterator<Object> iter) {
-  	super.deserialize(iter);
-  	timestamp = asLong(iter.next());
-  }
-	
-	public long getTimestamp() {
-		return timestamp;
-	}
+    private long timestamp;
 
+    @Override
+    protected void deserialize(Iterator<Object> iter) {
+        super.deserialize(iter);
+        timestamp = asLong(iter.next());
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "Ping{" +
+            "timestamp=" + timestamp +
+            '}';
+    }
 }

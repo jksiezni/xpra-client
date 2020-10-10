@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,24 +18,23 @@
 package xpra.protocol.packets;
 
 import java.util.Iterator;
-import java.util.Map;
+
 
 public class NewWindowOverrideRedirect extends NewWindow {
 
-	public NewWindowOverrideRedirect() {
-		super("new-override-redirect");
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void deserialize(Iterator<Object> iter) {
-		super.deserialize(iter);
-    if(!isOverrideRedirect()) {
-      setOverrideRedirect(true);
+    public NewWindowOverrideRedirect() {
+        super("new-override-redirect");
     }
-	}
 
-	private void setOverrideRedirect(boolean enabled) {
-		metadata.put("override-redirect", enabled);
-	}
+    @Override
+    public void deserialize(Iterator<Object> iter) {
+        super.deserialize(iter);
+        if (!isOverrideRedirect()) {
+            setOverrideRedirect(true);
+        }
+    }
+
+    private void setOverrideRedirect(boolean enabled) {
+        metadata.put("override-redirect", enabled);
+    }
 }

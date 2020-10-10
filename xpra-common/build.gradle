@@ -1,14 +1,44 @@
+/*
+ * Copyright (C) 2020 Jakub Ksiezniak
+ *
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License along
+ *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 apply plugin: 'java'
+apply plugin: 'kotlin'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compile 'com.github.jksiezni:bee-encode:0.3'
-    compile 'com.github.jksiezni:rencode4j:1.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.github.jksiezni:bee-encode:0.3'
+    implementation 'com.github.jksiezni:rencode4j:1.2.0'
 
-    compile 'org.slf4j:slf4j-api:1.7.25'
-    compile 'com.jcraft:jsch:0.1.52'
+    api 'org.slf4j:slf4j-api:1.7.25'
+    api 'com.jcraft:jsch:0.1.52'
 
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.7"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.7"
+    }
 }

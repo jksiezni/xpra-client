@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -18,90 +18,51 @@
 
 package com.github.jksiezni.xpra;
 
-import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
-import com.github.jksiezni.xpra.fragments.ServersListFragment;
-import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.github.jksiezni.xpra.config.ServersListFragment;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import timber.log.Timber;
 
-import xpra.protocol.packets.HelloRequest;
-import xpra.protocol.packets.SetDeflate;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity implements GlobalActivityAccessor {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-	private FloatingActionButton floatingButton;
+        // Set the custom toolbar
+        final Toolbar toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-
-		// Set the custom toolbar
-		final Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setLogo(R.mipmap.ic_launcher);
-		
-		floatingButton = (FloatingActionButton) findViewById(R.id.floatingButton);
-
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction().add(R.id.container, new ServersListFragment()).commit();
-		}
-		getFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-			@Override
-			public void onBackStackChanged() {
-				shouldDisplayNavigateUp();
-			}
-		});
-		shouldDisplayNavigateUp();
-	}
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        long start = System.currentTimeMillis();
-        for (int i = 0; i < 1000000; ++i) {
-            SetDeflate deflate = new SetDeflate(123);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, new ServersListFragment())
+                .commit();
         }
-        Log.i("bench", "TIme: " + (System.currentTimeMillis()-start));
-      }
-    }).start();
-  }
+        getSupportFragmentManager().addOnBackStackChangedListener(this::shouldDisplayNavigateUp);
+        shouldDisplayNavigateUp();
+    }
 
-  @Override
-	protected void onDestroy() {
-		OpenHelperManager.releaseHelper();
-		super.onDestroy();
-	}
-	
-	@Override
-	public void onBackPressed() {
-		if(!getFragmentManager().popBackStackImmediate()) {
-			super.onBackPressed();
-		}
-	}
+    @Override
+    public void onBackPressed() {
+        Timber.v("onBackPressed()");
+        if (!getSupportFragmentManager().popBackStackImmediate()) {
+            super.onBackPressed();
+        }
+    }
 
-	@Override
-	public FloatingActionButton getFloatingActionButton() {
-		return floatingButton;
-	}
+    @Override
+    public boolean onNavigateUp() {
+        Timber.v("onNavigateUp()");
+        return getSupportFragmentManager().popBackStackImmediate() || super.onNavigateUp();
+    }
 
-	@Override
-	public boolean onNavigateUp() {
-		return getFragmentManager().popBackStackImmediate() || super.onNavigateUp();
-	}
-
-	private void shouldDisplayNavigateUp() {
-		final boolean showNavigateUp = getFragmentManager().getBackStackEntryCount() > 0;
-		getSupportActionBar().setDisplayHomeAsUpEnabled(showNavigateUp);
-	}
+    private void shouldDisplayNavigateUp() {
+        Timber.v("shouldDisplayNavigateUp()");
+        final boolean showNavigateUp = getSupportFragmentManager().getBackStackEntryCount() > 0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(showNavigateUp);
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -36,13 +36,16 @@ import xpra.protocol.packets.WindowMetadata;
 public abstract class XpraWindow {
 
 	private final int id;
-	private XpraSender sender;
-	
 	private final int parentId;
-	
+
+    private XpraSender sender;
+
+    private String title;
+
 	public XpraWindow(NewWindow wndPacket) {
 		this.id = wndPacket.getWindowId();
 		this.parentId = wndPacket.getMetadata().getParentId();
+		this.title = wndPacket.getMetadata().getTitle();
 	}
 	
 	void setSender(XpraSender sender) {
@@ -60,8 +63,12 @@ public abstract class XpraWindow {
 	public boolean hasParent() {
 		return parentId != WindowMetadata.NO_PARENT;
 	}
-	
-	protected void onStart(NewWindow wnd) {
+
+    public String getTitle() {
+        return title;
+    }
+
+    protected void onStart(NewWindow wnd) {
 		onMetadataUpdate(wnd.getMetadata());
 	}
 	
@@ -69,6 +76,7 @@ public abstract class XpraWindow {
 	
 	protected void onMetadataUpdate(WindowMetadata metadata) {
 		onIconUpdate(metadata.getIcon());
+		this.title = metadata.getTitle();
 	}
 
 	protected void onMoveResize(ConfigureWindow config) {

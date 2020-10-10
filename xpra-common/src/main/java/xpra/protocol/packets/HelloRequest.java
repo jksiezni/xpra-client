@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -49,6 +49,10 @@ public class HelloRequest extends xpra.protocol.IOPacket {
 		caps.put("client_type", "Java");
 		caps.put("screen_sizes", new int[][] { screenDims });
 		caps.put("encodings", PictureEncoding.toString(encodings));
+		caps.put("encodings.core", PictureEncoding.toString(encodings));
+		caps.put("encodings.window-icon", new String[] {PictureEncoding.png.toString()});
+		caps.put("encodings.cursor", new String[] {PictureEncoding.png.toString()});
+        caps.put("encoding.icons.max_size", new int[]{128, 128});
 		caps.put("zlib", true);
 		caps.put("clipboard", false);
 		caps.put("notifications", true);

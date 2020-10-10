@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@
 package com.github.jksiezni.xpra.views;
 
 import android.content.Context;
-import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.ScaleGestureDetectorCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -33,11 +31,14 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.OverScroller;
 
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.ScaleGestureDetectorCompat;
+import timber.log.Timber;
+
 /**
  * Scrolling view.
  */
 public class XYScrollView extends FrameLayout {
-	private static final String TAG = XYScrollView.class.getSimpleName();
 
 	private final GestureDetectorCompat gestureDetector;
 	private final ScaleGestureDetector scaleGestureDetector;
@@ -114,8 +115,7 @@ public class XYScrollView extends FrameLayout {
 
 				final int pointerIndex = ev.findPointerIndex(activePointerId);
 				if (pointerIndex == -1) {
-					Log.e(TAG, "Invalid pointerId=" + activePointerId
-							+ " in onInterceptTouchEvent");
+                    Timber.e("Invalid pointerId=" + activePointerId + " in onInterceptTouchEvent");
 					break;
 				}
 
@@ -250,7 +250,7 @@ public class XYScrollView extends FrameLayout {
 
 		@Override
 		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-			Log.i(TAG, "distx: " + distanceX + ", distY: " + distanceY);
+            Timber.i("distx: " + distanceX + ", distY: " + distanceY);
 			scrollBy((int)distanceX, (int)distanceY);
 			return super.onScroll(e1, e2, distanceX, distanceY);
 		}
