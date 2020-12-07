@@ -38,12 +38,23 @@ public abstract class XpraWindow {
 	private final int id;
 	private final int parentId;
 
+	private int x;
+	private int y;
+	private int width;
+	private int height;
+
+	private boolean mapped;
+
     private XpraSender sender;
 
     private String title;
 
 	public XpraWindow(NewWindow wndPacket) {
 		this.id = wndPacket.getWindowId();
+		this.x = wndPacket.getX();
+		this.y = wndPacket.getY();
+		this.width = wndPacket.getWidth();
+		this.height = wndPacket.getHeight();
 		this.parentId = wndPacket.getMetadata().getParentId();
 		this.title = wndPacket.getMetadata().getTitle();
 	}
@@ -68,32 +79,56 @@ public abstract class XpraWindow {
         return title;
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     protected void onStart(NewWindow wnd) {
 		onMetadataUpdate(wnd.getMetadata());
 	}
 	
-	protected abstract void onStop();
+	protected void onStop() {
+	    mapped = false;
+    }
 	
 	protected void onMetadataUpdate(WindowMetadata metadata) {
-		onIconUpdate(metadata.getIcon());
-		this.title = metadata.getTitle();
-	}
+        final String title = metadata.getTitle();
+        if (title != null) {
+            this.title = title;
+        }
+        WindowIcon icon = metadata.getIcon();
+        if (icon != null) {
+            onIconUpdate(icon);
+        }
+    }
 
 	protected void onMoveResize(ConfigureWindow config) {
 		// empty
 	}
 	
 	protected void onIconUpdate(WindowIcon windowIcon) {
-		
+        // empty
 	}
 
-	public abstract void draw(DrawPacket packet);
+	public abstract void onDraw(DrawPacket packet);
 
 	protected void sendDamageSequence(DrawPacket packet, long frameTime) {
 		sendDamageSequence(sender, packet, frameTime);
 	}
 
-	static void sendDamageSequence(XpraSender sender, DrawPacket packet, long frameTime) {
+	public static void sendDamageSequence(XpraSender sender, DrawPacket packet, long frameTime) {
 		if (packet.packet_sequence >= 0) {
 			sender.send(new DamageSequence(packet, frameTime));
 		}
@@ -108,7 +143,10 @@ public abstract class XpraWindow {
 	}
 
 	protected void mapWindow(int x, int y, int width, int height) {
-		sender.send(new MapWindow(id, x, y, width, height));
+	    if (!mapped) {
+            sender.send(new MapWindow(id, x, y, width, height));
+            mapped = true;
+        }
 	}
 	
 	protected void configureWindow(int x, int y, int width, int height) {
@@ -116,10 +154,17 @@ public abstract class XpraWindow {
 	}
 	
 	protected void unmapWindow() {
-		sender.send(new UnmapWindow(id));
+	    if (mapped) {
+            sender.send(new UnmapWindow(id));
+            mapped = false;
+        }
 	}
-	
-	protected void closeWindow() {
+
+    public boolean isShown() {
+        return mapped;
+    }
+
+    protected void closeWindow() {
 		sender.send(new CloseWindow(id));
 	}
 	
@@ -129,7 +174,7 @@ public abstract class XpraWindow {
 	
 	public void mouseAction(int button, boolean pressed, int x, int y) {
 		if(x < 0 || y < 0) {
-			throw new IllegalArgumentException("Minus coordinates are not allowed: " + x + ", " + y);
+			throw new IllegalArgumentException("Negative coordinates are not allowed: " + x + ", " + y);
 		}
 		sender.send(new MouseButtonAction(id, button, pressed, x, y));
 	}

@@ -99,7 +99,8 @@ public abstract class XpraClient {
             @Override
             public void process(NewWindow response) throws IOException {
                 LOGGER.info("Processing... " + response);
-                final XpraWindow window = onCreateWindow(response);
+                final XpraWindow parent = windows.get(response.getMetadata().getParentId());
+                final XpraWindow window = onCreateWindow(response, parent);
                 window.setSender(sender);
                 windows.put(window.getId(), window);
                 window.onStart(response);
@@ -110,7 +111,8 @@ public abstract class XpraClient {
             @Override
             public void process(NewWindowOverrideRedirect response) throws IOException {
                 LOGGER.info("Processing... " + response);
-                final XpraWindow window = onCreateWindow(response);
+                XpraWindow parent = windows.get(response.getParentWindowId());
+                final XpraWindow window = onCreateWindow(response, parent);
                 window.setSender(sender);
                 windows.put(window.getId(), window);
                 window.onStart(response);
@@ -128,7 +130,7 @@ public abstract class XpraClient {
             public void process(DrawPacket packet) throws IOException {
                 final XpraWindow xpraWindow = windows.get(packet.getWindowId());
                 if (xpraWindow != null) {
-                    xpraWindow.draw(packet);
+                    xpraWindow.onDraw(packet);
                 } else {
                     LOGGER.error("Missing window when handling: " + packet);
                     //XpraWindow.sendDamageSequence(sender, packet, 0);
@@ -212,9 +214,10 @@ public abstract class XpraClient {
      * Called when a new window is created.
      *
      * @param wndPacket - A new window packet.
+     * @param parentWindow - A parent window, or {@code null}
      * @return
      */
-    protected abstract XpraWindow onCreateWindow(NewWindow wndPacket);
+    protected abstract XpraWindow onCreateWindow(NewWindow wndPacket, XpraWindow parentWindow);
 
     /**
      * Called when a window is destroyed.

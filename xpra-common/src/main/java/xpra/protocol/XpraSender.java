@@ -112,7 +112,6 @@ public final class XpraSender implements Closeable {
                     bencoder.writeCollection(list);
                     headerChunk.setFlags(0);
                 }
-                logger.trace("send(" + list + ")");
 
                 final byte[] bytes = byteStream.getBytes();
                 final int packetSize = byteStream.size();
@@ -129,7 +128,7 @@ public final class XpraSender implements Closeable {
 
                 headerChunk.setPacketSize(packetSize);
 
-                logger.trace("send(): payload size is " + packetSize + " bytes");
+                logger.trace("send(" + list + ")");
                 headerChunk.writeHeader(outputStream);
                 outputStream.write(bytes, 0, packetSize);
                 outputStream.flush();

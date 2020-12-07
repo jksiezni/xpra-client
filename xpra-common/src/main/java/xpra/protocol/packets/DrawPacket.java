@@ -71,6 +71,10 @@ public class DrawPacket extends WindowPacket {
         }
     }
 
+    public String getOption(String key) {
+        return asString(options.get(key));
+    }
+
     @Override
     public String toString() {
         return String.format("%s(%d, %dx%d, %dx%d, %s, opts=%s)", getClass().getSimpleName(), windowId, x, y, w, h, encoding, options.keySet());

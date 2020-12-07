@@ -20,6 +20,7 @@ package xpra.protocol.packets;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +34,14 @@ import xpra.protocol.ProtocolConstants;
 
 public class HelloRequest extends xpra.protocol.IOPacket {
 
+    private static final int[] CAPS_MAX_ICON_SIZE = {128, 128};
+
 	private final Map<String, Object> caps = new LinkedHashMap<>();
 
 	public HelloRequest(int screenWidth, int screenHeight, XpraKeyboard keyboard, PictureEncoding defaultEncoding, PictureEncoding[] encodings) {
 		super("hello");
 		caps.put("version", ProtocolConstants.VERSION);
-		// if (enc_pass != null) {
-		// caps.put("challenge_response", enc_pass);
-		// }
+
 		final int[] screenDims = new int[] { screenWidth, screenHeight };
 		caps.put("desktop_size", screenDims);
 		caps.put("dpi", 96);
@@ -52,7 +53,8 @@ public class HelloRequest extends xpra.protocol.IOPacket {
 		caps.put("encodings.core", PictureEncoding.toString(encodings));
 		caps.put("encodings.window-icon", new String[] {PictureEncoding.png.toString()});
 		caps.put("encodings.cursor", new String[] {PictureEncoding.png.toString()});
-        caps.put("encoding.icons.max_size", new int[]{128, 128});
+        caps.put("encoding.icons.max_size", CAPS_MAX_ICON_SIZE);
+
 		caps.put("zlib", true);
 		caps.put("clipboard", false);
 		caps.put("notifications", true);
@@ -70,6 +72,10 @@ public class HelloRequest extends xpra.protocol.IOPacket {
 		}
 		caps.put("platform", System.getProperty("os.name").toLowerCase());
 		caps.put("uuid", UUID.randomUUID().toString().replace("-", ""));
+
+		// it is required, if client wants to display windows (since 4.x)
+		caps.put("windows", true);
+
 		setKeyboard(keyboard);
 	}
 

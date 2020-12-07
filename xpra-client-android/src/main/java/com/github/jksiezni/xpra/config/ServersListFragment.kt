@@ -30,9 +30,9 @@ import com.github.jksiezni.xpra.R
 import com.github.jksiezni.xpra.client.ConnectionEventListener
 import com.github.jksiezni.xpra.client.ServiceBinderFragment
 import com.github.jksiezni.xpra.connection.ActiveConnectionFragment
+import com.github.jksiezni.xpra.databinding.ServersFragmentBinding
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.servers_fragment.*
 import timber.log.Timber
 import java.io.IOException
 
@@ -41,6 +41,10 @@ class ServersListFragment : Fragment() {
     private val disposables = CompositeDisposable()
     private val service by lazy { ServiceBinderFragment.obtain(activity) }
     private val adapter = ServerDetailsAdapter()
+
+    private var _binding: ServersFragmentBinding? = null
+    private val binding get() = _binding!!
+
 
     private val connectionListener = object : ConnectionEventListener {
         override fun onConnected(serverDetails: ServerDetails) {
@@ -57,13 +61,15 @@ class ServersListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.servers_fragment, container, false)
+        _binding = ServersFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.v("onViewCreated")
         val floatingButton = view.findViewById<View>(R.id.floatingButton)
         floatingButton.setOnClickListener { newConnection() }
-        serversList.adapter = adapter
+        binding.serversList.adapter = adapter
         adapter.secondaryAction.subscribe { item ->
             if (adapter.isConnected(item)) {
                 service.whenXpraAvailable { it.disconnect() }
@@ -96,9 +102,6 @@ class ServersListFragment : Fragment() {
 
         service.whenXpraAvailable { s ->
             s.registerConnectionListener(connectionListener)
-            s.connectedServerDetails?.let {
-                adapter.setConnected(it, true)
-            }
         }
     }
 
@@ -131,9 +134,15 @@ class ServersListFragment : Fragment() {
     private fun updateServersList(list: List<ServerDetails>?) {
         adapter.submitList(list)
         if (list?.isEmpty() == false) {
-            emptyView.visibility = View.GONE
+            binding.emptyView.visibility = View.GONE
         } else {
-            emptyView.visibility = View.VISIBLE
+            binding.emptyView.visibility = View.VISIBLE
+        }
+        adapter.clearConnections()
+        service.whenXpraAvailable { s ->
+            s.connectionDetails?.let {
+                adapter.setConnected(it, true)
+            }
         }
     }
 

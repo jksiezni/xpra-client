@@ -29,7 +29,7 @@ import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 
 
-class AndroidXpraKeyboard implements XpraKeyboard {
+public class AndroidXpraKeyboard implements XpraKeyboard {
 
     private static final SparseArray<String> keymap = new SparseArray<>();
 

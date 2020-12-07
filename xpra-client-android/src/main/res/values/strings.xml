@@ -36,10 +36,11 @@
     <string name="automatic">Automatic</string>
     <string name="edit">edit</string>
     <string name="start">start</string>
-    <string name="no_connections_label">You have no Xpra connections defined.</string>
+    <string name="no_connections_label">You have no connections defined</string>
     <string name="open">open</string>
     <string name="exit">exit</string>
     <string name="keyboard">keyboard</string>
     <string name="already_connected">A single connection is supported now.</string>
+    <string name="no_tasks_label">No active tasks</string>
 
 </resources>

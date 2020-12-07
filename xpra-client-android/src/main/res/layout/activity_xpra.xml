@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".client.XpraActivity" >
+    tools:context=".view.XpraActivity" >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -31,8 +31,8 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize" />
 
-    <TextureView
-        android:id="@+id/xpraView"
+    <com.github.jksiezni.xpra.view.WorkspaceView
+        android:id="@+id/workspaceView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

@@ -30,7 +30,7 @@ dependencies {
     api 'org.slf4j:slf4j-api:1.7.25'
     api 'com.jcraft:jsch:0.1.52'
 
-    testImplementation 'junit:junit:4.13'
+    testImplementation 'junit:junit:4.13.1'
 }
 compileKotlin {
     kotlinOptions {

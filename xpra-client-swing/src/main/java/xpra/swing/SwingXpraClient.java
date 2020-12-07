@@ -15,10 +15,6 @@
  *     with this program; if not, write to the Free Software Foundation, Inc.,
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-/**
- *
- */
 package xpra.swing;
 
 import java.awt.Cursor;
@@ -73,7 +69,7 @@ public class SwingXpraClient extends XpraClient {
     }
 
     @Override
-    protected XpraWindow onCreateWindow(NewWindow wnd) {
+    protected XpraWindow onCreateWindow(NewWindow wnd, XpraWindow parentWindow) {
         if (wnd.isOverrideRedirect()) {
             final XpraWindow owner = getWindow(wnd.getMetadata().getParentId());
             if (owner instanceof SwingPopup) {

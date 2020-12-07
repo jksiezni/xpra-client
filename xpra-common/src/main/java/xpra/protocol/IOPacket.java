@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@ import java.util.Collection;
 
 public abstract class IOPacket extends Packet {
 
-  public final String type;
+    public final String type;
 
-  public IOPacket(String type) {
-    this.type = type;
-  }
+    public IOPacket(String type) {
+        this.type = type;
+    }
 
-  protected abstract void serialize(Collection<Object> elems);
+    protected abstract void serialize(Collection<Object> elems);
 
 }

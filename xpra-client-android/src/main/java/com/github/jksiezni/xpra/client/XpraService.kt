@@ -187,7 +187,7 @@ class XpraService : Service() {
             this@XpraService.disconnect()
         }
 
-        override fun getConnectedServerDetails(): ServerDetails? {
+        override fun getConnectionDetails(): ServerDetails? {
             return serverDetails
         }
 

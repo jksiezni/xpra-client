@@ -82,6 +82,10 @@ class ServerDetailsAdapter : ListAdapter<ServerDetails, ServerDetailsAdapter.Vie
         return connectionFlags.contains(item.id)
     }
 
+    fun clearConnections() {
+        connectionFlags.clear()
+    }
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val nameView: TextView = itemView.findViewById(R.id.connection_name)
         val typeView: TextView = itemView.findViewById(R.id.connection_type)

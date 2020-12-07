@@ -54,4 +54,13 @@ public class WindowIcon extends WindowPacket {
 		data = (byte[]) iter.next();	
 	}
 
+    @Override
+    public String toString() {
+        return "WindowIcon{" +
+            "width=" + width +
+            ", height=" + height +
+            ", encoding=" + encoding +
+            ", windowId=" + windowId +
+            '}';
+    }
 }

@@ -17,24 +17,13 @@
  */
 package xpra.protocol.packets;
 
-import java.util.Iterator;
-
-
 public class NewWindowOverrideRedirect extends NewWindow {
 
     public NewWindowOverrideRedirect() {
         super("new-override-redirect");
     }
 
-    @Override
-    public void deserialize(Iterator<Object> iter) {
-        super.deserialize(iter);
-        if (!isOverrideRedirect()) {
-            setOverrideRedirect(true);
-        }
-    }
-
-    private void setOverrideRedirect(boolean enabled) {
-        metadata.put("override-redirect", enabled);
+    public int getParentWindowId() {
+        return metadata.getParentId();
     }
 }

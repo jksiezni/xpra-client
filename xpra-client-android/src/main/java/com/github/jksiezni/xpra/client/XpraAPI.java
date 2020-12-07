@@ -24,15 +24,18 @@ import com.github.jksiezni.xpra.ssh.SshUserInfoHandler;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  *
  */
 public interface XpraAPI {
 
+    @NonNull
     AndroidXpraClient getXpraClient();
 
-    ServerDetails getConnectedServerDetails();
+    @Nullable
+    ServerDetails getConnectionDetails();
 
     void connect(@NonNull ServerDetails serverDetails, @NonNull SshUserInfoHandler userInfoHandler) throws IOException;
 

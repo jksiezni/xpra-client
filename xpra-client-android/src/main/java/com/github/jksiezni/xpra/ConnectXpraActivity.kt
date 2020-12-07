@@ -25,12 +25,12 @@ import com.github.jksiezni.xpra.client.ConnectionEventListener
 import com.github.jksiezni.xpra.client.ServiceBinderFragment
 import com.github.jksiezni.xpra.config.ConfigDatabase
 import com.github.jksiezni.xpra.config.ServerDetails
+import com.github.jksiezni.xpra.databinding.ActivityConnectBinding
 import com.github.jksiezni.xpra.ssh.SshUserInfoHandler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_connect.*
 import timber.log.Timber
 import java.io.IOException
 
@@ -41,10 +41,13 @@ class ConnectXpraActivity : AppCompatActivity(), ConnectionEventListener {
 
     private val disposables = CompositeDisposable()
 
+    private lateinit var binding: ActivityConnectBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate()")
-        setContentView(R.layout.activity_connect)
+        binding = ActivityConnectBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         serviceBinderFragment.whenXpraAvailable { api ->
             api.registerConnectionListener(this)
             if (api.isConnected) {
@@ -90,8 +93,8 @@ class ConnectXpraActivity : AppCompatActivity(), ConnectionEventListener {
     override fun onConnectionError(serverDetails: ServerDetails, e: IOException) {
         Timber.e(e)
         lifecycleScope.launchWhenStarted {
-            connectProgressBar.visibility = View.GONE
-            connectionLabel.text = e.message
+            binding.connectProgressBar.visibility = View.GONE
+            binding.connectionLabel.text = e.message
         }
     }
 

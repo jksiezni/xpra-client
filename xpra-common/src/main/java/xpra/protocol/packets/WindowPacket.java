@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Jakub Ksiezniak
+ * Copyright (C) 2020 Jakub Ksiezniak
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -23,30 +23,34 @@ import java.util.Iterator;
 
 public abstract class WindowPacket extends xpra.protocol.IOPacket {
 
-	protected int windowId;
+    protected int windowId;
 
-	protected WindowPacket(String type) {
-		super(type);
-	}
-	
-	protected WindowPacket(String type, int wid) {
-		super(type);
-		this.windowId = wid;
-	}
-	
-	public int getWindowId() {
-		return windowId;
-	}
-	
-	@Override
-	protected void serialize(Collection<Object> elems) {
-		elems.add(windowId);
-	}
+    protected WindowPacket(String type) {
+        super(type);
+    }
 
-	@Override
-  protected void deserialize(Iterator<Object> iter) {
-		super.deserialize(iter);
-		windowId = asInt(iter.next());
-	}
+    protected WindowPacket(String type, int wid) {
+        super(type);
+        this.windowId = wid;
+    }
 
+    public int getWindowId() {
+        return windowId;
+    }
+
+    @Override
+    protected void serialize(Collection<Object> elems) {
+        elems.add(windowId);
+    }
+
+    @Override
+    protected void deserialize(Iterator<Object> iter) {
+        super.deserialize(iter);
+        windowId = asInt(iter.next());
+    }
+
+    @Override
+    public String toString() {
+        return type + "{ windowId=" + windowId + "}";
+    }
 }

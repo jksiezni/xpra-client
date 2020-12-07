@@ -31,11 +31,12 @@ import com.github.jksiezni.xpra.client.AndroidXpraWindow
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import xpra.client.XpraWindow
+import java.util.*
 
 /**
  *
  */
-class WindowsAdapter : ListAdapter<XpraWindow, WindowsAdapter.ViewHolder>(DIFF_CALLBACK) {
+class WindowsAdapter(private val emptyView: TextView) : ListAdapter<XpraWindow, WindowsAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     private val clickPublisher = PublishSubject.create<AndroidXpraWindow>()
 
@@ -51,6 +52,14 @@ class WindowsAdapter : ListAdapter<XpraWindow, WindowsAdapter.ViewHolder>(DIFF_C
         holder.titleView.text = item.title
         holder.iconView.setImageDrawable(item.iconDrawable)
         holder.itemView.setOnClickListener { clickPublisher.onNext(item) }
+    }
+
+    override fun onCurrentListChanged(previousList: MutableList<XpraWindow>, currentList: MutableList<XpraWindow>) {
+        if (currentList.isEmpty()) {
+            emptyView.visibility = View.VISIBLE
+        } else {
+            emptyView.visibility = View.GONE
+        }
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -70,7 +79,7 @@ class WindowsAdapter : ListAdapter<XpraWindow, WindowsAdapter.ViewHolder>(DIFF_C
                     oldItem: XpraWindow, newItem: XpraWindow): Boolean {
                 // NOTE: if you use equals, your object must properly override Object#equals()
                 // Incorrectly returning false here will result in too many animations.
-                return oldItem.id == newItem.id
+                return Objects.equals(oldItem, newItem)
             }
         }
     }

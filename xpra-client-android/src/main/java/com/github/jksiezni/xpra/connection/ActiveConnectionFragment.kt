@@ -24,20 +24,22 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.github.jksiezni.xpra.R
 import com.github.jksiezni.xpra.client.ConnectionEventListener
-import com.github.jksiezni.xpra.client.Intents
+import com.github.jksiezni.xpra.view.Intents
 import com.github.jksiezni.xpra.client.ServiceBinderFragment
 import com.github.jksiezni.xpra.config.ServerDetails
+import com.github.jksiezni.xpra.databinding.ActiveConnectionFragmentBinding
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import kotlinx.android.synthetic.main.active_connection_fragment.*
 import java.io.IOException
 
 /**
  *
  */
 class ActiveConnectionFragment : Fragment() {
+
+    private var _binding: ActiveConnectionFragmentBinding? = null
+    private val binding get() = _binding!!
 
     private val service by lazy { ServiceBinderFragment.obtain(activity) }
 
@@ -65,6 +67,9 @@ class ActiveConnectionFragment : Fragment() {
         super.onStart()
         service.whenXpraAvailable { api ->
             api.registerConnectionListener(connectionListener)
+            if (!api.isConnected) {
+                exit()
+            }
         }
     }
 
@@ -76,17 +81,19 @@ class ActiveConnectionFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return layoutInflater.inflate(R.layout.active_connection_fragment, container, false)
+        _binding = ActiveConnectionFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         service.whenXpraAvailable { api ->
-            val adapter = WindowsAdapter()
-            adapter.submitList(api.xpraClient.windowsLiveData.value?.toList())
-            api.xpraClient.windowsLiveData.observe(viewLifecycleOwner) {
+            val adapter = WindowsAdapter(binding.emptyView)
+            binding.windowsRecyclerView.adapter = adapter
+
+            api.xpraClient.getWindowsLiveData().observe(viewLifecycleOwner) {
                 adapter.submitList(it.toList())
             }
-            windowsRecyclerView.adapter = adapter
+
             adapter.onClickAction.subscribe { window ->
                 val intent = Intents.createXpraIntent(requireContext(), window.id)
                 startActivity(intent)
@@ -102,7 +109,7 @@ class ActiveConnectionFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         service.whenXpraAvailable { api ->
-            activity?.title = api.connectedServerDetails.name
+            activity?.title = api.connectionDetails?.name
         }
     }
 

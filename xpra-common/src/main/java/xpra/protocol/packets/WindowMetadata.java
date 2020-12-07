@@ -19,125 +19,117 @@
 package xpra.protocol.packets;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class WindowMetadata extends WindowPacket {
-	public static final int NO_PARENT = -1;
+    public static final int NO_PARENT = -1;
 
-	public static final String META_TITLE = "title";
+    private static final String META_TITLE = "title";
+    private static final String META_ICON = "icon";
+    private static final String META_WINDOW_TYPE = "window-type";
 
-	private final Map<String, Object> meta;
-	
-	public WindowMetadata() {
-		this(0, new HashMap<>());
-	}
-	
-	public WindowMetadata(int windowId, Map<String, Object> meta) {
-		super("window-metadata", windowId);
-		this.meta = meta;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public void deserialize(Iterator<Object> iter) {
-		super.deserialize(iter);
-		meta.putAll((Map<String, Object>) iter.next());
-	}
-	
-	public int getWindowId() {
-		return windowId;
-	}
-	
-	public String getAsString(String key) {
-		return xpra.protocol.Packet.asString(meta.get(key));
-	}
-	
-	public boolean getAsBoolean(String key) {
-		Object value = meta.get(key);
-		if(value instanceof Boolean) {
-			return (Boolean) value;
-		} else if(value instanceof Number) {
-			return ((Number)value).intValue() != 0;
-		}
-		return false;
-	}
-	
-	public WindowIcon getIcon() {
-		List<?> iconlist = (List<?>) meta.get("icon");
-		WindowIcon icon = new WindowIcon(windowId);
-		if(iconlist != null) {
-			icon.readLocal(iconlist.iterator());
-		}
-		return icon;
-	}
-	
-	@Override
-	public String toString() {
-		TreeMap<String, Object> m = new TreeMap<>();
-		for(Entry<String, Object> e : meta.entrySet()) {
-			if(e.getValue() instanceof List) {
-				@SuppressWarnings("unchecked")
-				List<Object> list = new ArrayList<>((List<Object>) e.getValue());
-				for(int i = 0; i < list.size(); ++i) {
-					if(list.get(i) instanceof byte[]) {
-						list.set(i, asString(list.get(i)));
-					}
-				}
-				m.put(e.getKey(), list);
-			}
-			else if(e.getValue() instanceof byte[]) {
-				m.put(e.getKey(), asString(e.getValue()));
-			} else {
-				m.put(e.getKey(), e.getValue());
-			}
-		}
-		return m.toString();
-	}
+    public static final String WINDOW_TYPE_NORMAL = "NORMAL";
+    public static final String WINDOW_TYPE_POPUP_MENU = "POPUP_MENU";
+    public static final String WINDOW_TYPE_DROPDOWN_MENU = "DROPDOWN_MENU";
 
-	public void put(String key, Object value) {
-		meta.put(key, value);
-	}
+    private final Map<String, Object> meta;
 
-	public int getParentId() {
-		final Object value = meta.get("transient-for");
-		if(value != null) {
-			return asInt(value);
-		}
-		return NO_PARENT;
-	}
-
-	public Integer getAsInt(String key) {
-		final Object value = meta.get(key);
-		if(value != null) {
-			return asInt(value);
-		}
-		return null;
-	}
-
-	public EnumSet<WindowType> getWindowTypes() {
-    final EnumSet<WindowType> types = EnumSet.noneOf(WindowType.class);
-	  final Object value = meta.get("window-type");
-    if (value != null) {
-      List<String> list = asStringList(value);
-
-      for (String elem : list) {
-        types.add(WindowType.valueOf(elem));
-      }
+    public WindowMetadata() {
+        this(0, new HashMap<>());
     }
-    return types;
-  }
+
+    public WindowMetadata(int windowId, Map<String, Object> meta) {
+        super("window-metadata", windowId);
+        this.meta = meta;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void deserialize(Iterator<Object> iter) {
+        super.deserialize(iter);
+        meta.putAll((Map<String, Object>) iter.next());
+    }
+
+    public int getWindowId() {
+        return windowId;
+    }
+
+    public String getAsString(String key) {
+        return asString(meta.get(key));
+    }
+
+    public boolean getAsBoolean(String key) {
+        Object value = meta.get(key);
+        return asBoolean(value);
+    }
+
+    public WindowIcon getIcon() {
+        List<?> iconlist = (List<?>) meta.get(META_ICON);
+        if (iconlist != null) {
+            WindowIcon icon = new WindowIcon(windowId);
+            icon.readLocal(iconlist.iterator());
+            return icon;
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        TreeMap<String, Object> m = new TreeMap<>();
+        for (Entry<String, Object> e : meta.entrySet()) {
+            if (e.getValue() instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Object> list = new ArrayList<>((List<Object>) e.getValue());
+                for (int i = 0; i < list.size(); ++i) {
+                    if (list.get(i) instanceof byte[]) {
+                        list.set(i, asString(list.get(i)));
+                    }
+                }
+                m.put(e.getKey(), list);
+            } else if (e.getValue() instanceof byte[]) {
+                m.put(e.getKey(), asString(e.getValue()));
+            } else {
+                m.put(e.getKey(), e.getValue());
+            }
+        }
+        return m.toString();
+    }
+
+    public int getParentId() {
+        final Object value = meta.get("transient-for");
+        if (value != null) {
+            return asInt(value);
+        }
+        return NO_PARENT;
+    }
+
+    public Integer getAsInt(String key) {
+        final Object value = meta.get(key);
+        if (value != null) {
+            return asInt(value);
+        }
+        return null;
+    }
+
+    public Set<String> getWindowTypes() {
+        final Object value = meta.get(META_WINDOW_TYPE);
+        if (value != null) {
+            List<String> list = asStringList(value);
+            return Collections.unmodifiableSet(new HashSet<>(list));
+        }
+        return Collections.emptySet();
+    }
 
     public String getTitle() {
         return getAsString(META_TITLE);
     }
 
-    public enum WindowType {
-	  DROPDOWN_MENU, POPUP_MENU, NORMAL
-  }
 }

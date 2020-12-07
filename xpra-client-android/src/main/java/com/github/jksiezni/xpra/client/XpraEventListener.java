@@ -18,11 +18,14 @@
 
 package com.github.jksiezni.xpra.client;
 
-import android.widget.PopupWindow;
+import androidx.annotation.NonNull;
 
 /**
  *
  */
+public interface XpraEventListener {
 
-public class XpraPopup extends PopupWindow {
+    void onWindowCreated(@NonNull AndroidXpraWindow window);
+
+    void onWindowLost(@NonNull AndroidXpraWindow window);
 }

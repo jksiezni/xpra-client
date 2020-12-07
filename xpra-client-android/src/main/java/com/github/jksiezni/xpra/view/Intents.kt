@@ -16,7 +16,7 @@
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package com.github.jksiezni.xpra.client
+package com.github.jksiezni.xpra.view
 
 import android.content.Context
 import android.content.Intent
