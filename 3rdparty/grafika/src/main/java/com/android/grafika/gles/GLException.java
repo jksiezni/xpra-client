@@ -16,7 +16,39 @@
  *     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-include ':3rdparty:grafika'
-include 'xpra-common'
-include 'xpra-client-swing'
-include 'xpra-client-android'
+package com.android.grafika.gles;
+
+import android.opengl.GLES10;
+import android.opengl.GLU;
+
+/**
+ *
+ */
+public class GLException extends RuntimeException {
+
+    private final int mError;
+
+    public GLException(final String msg) {
+        super(msg);
+        mError = GLES10.GL_NO_ERROR;
+    }
+
+    public GLException(final String msg, final int error) {
+        super(getErrorString(msg, error));
+        mError = error;
+    }
+
+    private static String getErrorString(String msg, int error) {
+        String errorString = GLU.gluErrorString(error);
+        if (errorString == null) {
+            errorString = "Unknown error 0x" + Integer.toHexString(error);
+        }
+        return msg + " : glError " + errorString;
+    }
+
+    public int getError() {
+        return mError;
+    }
+
+}
+
