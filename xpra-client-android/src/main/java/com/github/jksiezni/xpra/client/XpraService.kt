@@ -22,7 +22,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.database.Observable
 import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.Build
@@ -44,6 +43,7 @@ import xpra.network.SshXpraConnector
 import xpra.network.TcpXpraConnector
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 
 
 class XpraService : Service() {
@@ -205,30 +205,33 @@ class XpraService : Service() {
 
     }
 
-    private class ConnectionObserver : Observable<ConnectionEventListener>(), ConnectionEventListener {
+    private class ConnectionObserver : ConnectionEventListener {
+        private val listeners = CopyOnWriteArrayList<ConnectionEventListener>()
         private val mainScope = CoroutineScope(Dispatchers.Main)
+
+        fun registerObserver(listener: ConnectionEventListener) {
+            listeners.add(listener)
+        }
+
+        fun unregisterObserver(listener: ConnectionEventListener) {
+            listeners.remove(listener)
+        }
 
         override fun onConnected(serverDetails: ServerDetails) {
             mainScope.launch {
-                for (l in mObservers) {
-                    l?.onConnected(serverDetails)
-                }
+                listeners.forEach { it.onConnected(serverDetails) }
             }
         }
 
         override fun onDisconnected(serverDetails: ServerDetails) {
             mainScope.launch {
-                for (l in mObservers) {
-                    l?.onDisconnected(serverDetails)
-                }
+                listeners.forEach { it.onDisconnected(serverDetails) }
             }
         }
 
         override fun onConnectionError(serverDetails: ServerDetails, e: IOException) {
             mainScope.launch {
-                for (l in mObservers) {
-                    l?.onConnectionError(serverDetails, e)
-                }
+                listeners.forEach { it.onConnectionError(serverDetails, e) }
             }
         }
     }

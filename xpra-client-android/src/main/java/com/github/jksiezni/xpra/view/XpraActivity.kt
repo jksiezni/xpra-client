@@ -38,13 +38,14 @@ class XpraActivity : AppCompatActivity(), XpraEventListener, XpraWindowListener,
 
     private lateinit var binding: ActivityXpraBinding
 
-    private var windowId = 0
+    private lateinit var serviceBinderFragment: ServiceBinderFragment
 
-    private val serviceBinderFragment: ServiceBinderFragment by lazy { ServiceBinderFragment.obtain(this) }
+    private var windowId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.i("onCreate(): %s", intent)
+        serviceBinderFragment = ServiceBinderFragment.obtain(this)
         binding = ActivityXpraBinding.inflate(layoutInflater)
         setContentView(binding.root)
         if (!isValidXpraActivityIntent(intent)) {

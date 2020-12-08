@@ -45,8 +45,8 @@ class ProxyWindowView(context: Context, val window: AndroidXpraWindow) : Texture
 
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
                 Timber.tag("ProxyWindowView(${window.id})").v("onSurfaceTextureDestroyed")
-                window.hide()
-                return true
+                window.hide(surface)
+                return false
             }
 
             override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {

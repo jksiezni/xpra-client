@@ -73,9 +73,11 @@ class GLComposer(private val callback: ComposeCallback) : GLThread() {
             }
             MSG_DEL_SURFACE_TEX -> {
                 val windowId = msg.arg1
+                val surfaceTexture = msg.obj as SurfaceTexture
                 Timber.v("MSG_DEL_SURFACE_TEX $windowId")
                 baseSurface.makeCurrent()
                 drawTargets[windowId]?.setTarget(baseSurface)
+                surfaceTexture.release()
             }
             MSG_DRAW_PACKET -> {
                 val packet = msg.obj as DrawPacket
@@ -118,8 +120,8 @@ class GLComposer(private val callback: ComposeCallback) : GLThread() {
         handler.obtainMessage(MSG_ADD_SURFACE_TEX, windowId, 0, surfaceTexture).sendToTarget()
     }
 
-    fun removeSurface(windowId: Int) {
-        handler.obtainMessage(MSG_DEL_SURFACE_TEX, windowId).sendToTarget()
+    fun removeSurface(windowId: Int, surfaceTexture: SurfaceTexture) {
+        handler.obtainMessage(MSG_DEL_SURFACE_TEX, windowId, 0, surfaceTexture).sendToTarget()
     }
 
     private fun composePacket(packet: DrawPacket) {

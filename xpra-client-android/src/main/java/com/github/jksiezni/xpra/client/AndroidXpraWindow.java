@@ -149,18 +149,22 @@ public class AndroidXpraWindow extends XpraWindow {
     }
 
     public void show(SurfaceTexture surfaceTexture, int width, int height) {
-        int w = (int) (width / scale);
-        int h = (int) (height / scale);
-        int x = parent != null ? getX() : 0;
-        int y = parent != null ? getY() : 0;
         composer.addSurface(getId(), surfaceTexture);
-        mapWindow(x, y, w, h);
-        setFocused(true);
+        if (!isOverrideRedirect()) {
+            int w = (int) (width / scale);
+            int h = (int) (height / scale);
+            int x = parent != null ? getX() : 0;
+            int y = parent != null ? getY() : 0;
+            mapWindow(x, y, w, h);
+            setFocused(true);
+        }
     }
 
-    public void hide() {
-        composer.removeSurface(getId());
-        unmapWindow();
+    public void hide(SurfaceTexture surfaceTexture) {
+        composer.removeSurface(getId(), surfaceTexture);
+        if (!isOverrideRedirect()) {
+            unmapWindow();
+        }
     }
 
     public void addWindowListener(XpraWindowListener listener) {

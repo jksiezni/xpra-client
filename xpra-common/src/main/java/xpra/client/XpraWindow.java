@@ -38,6 +38,8 @@ public abstract class XpraWindow {
 	private final int id;
 	private final int parentId;
 
+	private final boolean overrideRedirect;
+
 	private int x;
 	private int y;
 	private int width;
@@ -57,6 +59,7 @@ public abstract class XpraWindow {
 		this.height = wndPacket.getHeight();
 		this.parentId = wndPacket.getMetadata().getParentId();
 		this.title = wndPacket.getMetadata().getTitle();
+		this.overrideRedirect = wndPacket.isOverrideRedirect();
 	}
 	
 	void setSender(XpraSender sender) {
@@ -93,6 +96,10 @@ public abstract class XpraWindow {
 
     public int getHeight() {
         return height;
+    }
+
+    public boolean isOverrideRedirect() {
+        return overrideRedirect;
     }
 
     protected void onStart(NewWindow wnd) {

@@ -46,7 +46,6 @@
 
         <activity
             android:name=".view.XpraActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             >
             <!-- android:documentLaunchMode="intoExisting" -->
         </activity>

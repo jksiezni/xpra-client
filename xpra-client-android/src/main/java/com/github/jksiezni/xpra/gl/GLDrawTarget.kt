@@ -60,6 +60,9 @@ internal class GLDrawTarget(
     }
 
     fun setTarget(eglSurface: EglSurfaceBase) {
+        if (this.eglSurface is WindowSurface) {
+            this.eglSurface.releaseEglSurface()
+        }
         this.eglSurface = eglSurface
     }
 
