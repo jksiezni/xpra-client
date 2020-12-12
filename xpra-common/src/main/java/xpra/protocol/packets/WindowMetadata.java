@@ -18,6 +18,8 @@
 
 package xpra.protocol.packets;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,12 +31,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import xpra.protocol.data.SizeConstraints;
+
 public class WindowMetadata extends WindowPacket {
     public static final int NO_PARENT = -1;
 
     private static final String META_TITLE = "title";
     private static final String META_ICON = "icon";
     private static final String META_WINDOW_TYPE = "window-type";
+    private static final String META_SIZE_CONSTRAINTS = "size-constraints";
 
     public static final String WINDOW_TYPE_NORMAL = "NORMAL";
     public static final String WINDOW_TYPE_POPUP_MENU = "POPUP_MENU";
@@ -132,4 +137,13 @@ public class WindowMetadata extends WindowPacket {
         return getAsString(META_TITLE);
     }
 
+    @Nullable
+    public SizeConstraints getSizeConstraints() {
+        Map<String, Object> map = asMap(meta.get(META_SIZE_CONSTRAINTS));
+        if (map != null) {
+            List<Number> minimumSize = asList(map.get("minimum-size"));
+            return new SizeConstraints(asInt(map.get("gravity")), minimumSize.get(0).intValue(), minimumSize.get(1).intValue());
+        }
+        return null;
+    }
 }

@@ -76,4 +76,8 @@ public abstract class Packet {
     protected byte[] asByteArray(Object obj) {
         return (byte[]) obj;
     }
+
+    protected <T> List<T> asList(Object obj) {
+        return (List<T>) obj;
+    }
 }

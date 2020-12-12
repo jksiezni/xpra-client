@@ -19,6 +19,7 @@
 package xpra.client;
 
 import xpra.protocol.XpraSender;
+import xpra.protocol.data.SizeConstraints;
 import xpra.protocol.packets.CloseWindow;
 import xpra.protocol.packets.ConfigureWindow;
 import xpra.protocol.packets.DamageSequence;
@@ -44,6 +45,8 @@ public abstract class XpraWindow {
 	private int y;
 	private int width;
 	private int height;
+	private int minimumWidth = 0;
+	private int minimumHeight = 0;
 
 	private boolean mapped;
 
@@ -60,6 +63,12 @@ public abstract class XpraWindow {
 		this.parentId = wndPacket.getMetadata().getParentId();
 		this.title = wndPacket.getMetadata().getTitle();
 		this.overrideRedirect = wndPacket.isOverrideRedirect();
+
+        SizeConstraints sizeConstraints = wndPacket.getMetadata().getSizeConstraints();
+        if (sizeConstraints != null) {
+            this.minimumWidth = sizeConstraints.minimumWidth;
+            this.minimumHeight = sizeConstraints.minimumHeight;
+        }
 	}
 	
 	void setSender(XpraSender sender) {
@@ -96,6 +105,14 @@ public abstract class XpraWindow {
 
     public int getHeight() {
         return height;
+    }
+
+    public int getMinimumWidth() {
+        return minimumWidth;
+    }
+
+    public int getMinimumHeight() {
+        return minimumHeight;
     }
 
     public boolean isOverrideRedirect() {
