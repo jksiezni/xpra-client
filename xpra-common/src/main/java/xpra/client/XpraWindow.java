@@ -153,7 +153,7 @@ public abstract class XpraWindow {
 	}
 
 	public static void sendDamageSequence(XpraSender sender, DrawPacket packet, long frameTime) {
-		if (packet.packet_sequence >= 0) {
+		if (sender != null && packet.packet_sequence >= 0) {
 			sender.send(new DamageSequence(packet, frameTime));
 		}
 	}
