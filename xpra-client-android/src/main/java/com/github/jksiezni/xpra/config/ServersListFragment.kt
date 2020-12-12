@@ -141,7 +141,7 @@ class ServersListFragment : Fragment() {
         adapter.clearConnections()
         service.whenXpraAvailable { s ->
             s.connectionDetails?.let {
-                adapter.setConnected(it, true)
+                adapter.setConnected(it, s.isConnected)
             }
         }
     }
