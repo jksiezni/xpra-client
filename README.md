@@ -1,27 +1,37 @@
-# xpra-client
-Xpra Client for Java/Android
+![Android Xpra Client Logo](/docs/images/android-xpra-client.png)
 
-# Building project
+# Xpra Client for Android / Java
+[![Build Status](https://travis-ci.org/jksiezni/xpra-client.svg?branch=master)](https://travis-ci.org/jksiezni/xpra-client)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Requirements:
 
-* Java 1.8
-* Android SDK
+This is an **unofficial** implementation of the Xpra Client for Android,
+that is based on original work from [Xpra.org](https://xpra.org).
 
-## Compiling
-1. Setup path to Android SDK with environment variable
+The purpose of this project is to deliver
+a neat remote desktop UX to mobile devices,
+by integrating remote apps with Android's ecosystem.
 
-	>	ANDROID_HOME=/path/to/android/sdk
+_The App is currently under heavy development._
 
-	or create a *local.properties* file and write:
+## Getting Started
 
-	>	sdk.dir=/path/to/android/sdk
+The project is in early stages of development, so it's not published in any app stores.
 
-2. Start building
+However, you can build it yourself if you are familiar with Android development.
 
-	>	$ ./gradlew build
+## Contributions
 
-3. Install app on the Android device
+Currently, all pull request will be rejected, because I look for a better licensing options than GPL.
+It will be easier to eventually change licensing, if there's only one developer holding IP rights.
+Sorry. :'(
 
-	>	$ ./gradlew installDebug
+Other contributions are welcome and encouraged, like:
+* How-To guides
+* bug reporting
+* new features & ideas
+* providing translations
 
+# Licensing
+
+See [LICENSE](/LICENSE)
