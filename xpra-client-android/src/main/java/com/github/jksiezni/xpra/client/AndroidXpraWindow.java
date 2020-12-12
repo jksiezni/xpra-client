@@ -148,13 +148,21 @@ public class AndroidXpraWindow extends XpraWindow {
         return drawable;
     }
 
+    public int getScaledX() {
+        return (int) (getX() * scale);
+    }
+
+    public int getScaledY() {
+        return (int) (getY() * scale);
+    }
+
     public void show(SurfaceTexture surfaceTexture, int width, int height) {
         composer.addSurface(getId(), surfaceTexture);
         if (!isOverrideRedirect()) {
             int w = (int) (width / scale);
             int h = (int) (height / scale);
-            int x = parent != null ? getX() : 0;
-            int y = parent != null ? getY() : 0;
+            int x = hasParent() ? getX() : 0;
+            int y = hasParent() ? getY() : 0;
             mapWindow(x, y, w, h);
             setFocused(true);
         }

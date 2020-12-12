@@ -61,14 +61,23 @@ class ProxyWindowView(context: Context, val window: AndroidXpraWindow) : Texture
             setMeasuredDimension((window.width*window.scale).toInt(), (window.height*window.scale).toInt())
         } else {
             setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
+            val minWidth = (window.minimumWidth * window.scale).toInt()
+            val minHeight = (window.minimumHeight * window.scale).toInt()
+
+            // adjust to size constraints
+            if (minWidth > measuredWidth || minHeight > measuredHeight) {
+                setMeasuredDimension(max(minWidth, measuredWidth), max(minHeight, measuredHeight))
+            }
         }
     }
 
     override fun getLayoutParams(): ViewGroup.LayoutParams? {
         val params = super.getLayoutParams()
         if (params is ViewGroup.MarginLayoutParams) {
-            params.leftMargin = (window.x * window.scale).toInt()
-            params.topMargin = (window.y * window.scale).toInt()
+            if (window.hasParent()) {
+                params.leftMargin = window.scaledX
+                params.topMargin = window.scaledY
+            }
         }
         return params
     }
