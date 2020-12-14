@@ -72,12 +72,12 @@ class XpraActivity : AppCompatActivity(), XpraEventListener, XpraWindowListener,
     }
 
     private fun restoreProxyViewHierarchy(rootWindow: AndroidXpraWindow) {
-        binding.workspaceView.addView(ProxyWindowView(this, rootWindow))
+        binding.workspaceView.addView(ProxyView(this, rootWindow))
         val list = mutableListOf<AndroidXpraWindow>()
         list.addAll(rootWindow.children)
         while (list.isNotEmpty()) {
             val child = list.removeFirst()
-            val proxyView = ProxyWindowView(this, child)
+            val proxyView = ProxyView(this, child)
             binding.workspaceView.addView(proxyView)
             child.addWindowListener(XpraWindowHandler(proxyView))
             list.addAll(child.children)
@@ -140,7 +140,7 @@ class XpraActivity : AppCompatActivity(), XpraEventListener, XpraWindowListener,
     override fun onWindowCreated(window: AndroidXpraWindow) {
         if (window.hasParent(windowId)) {
             runOnUiThread {
-                val proxyView = ProxyWindowView(this, window)
+                val proxyView = ProxyView(this, window)
                 binding.workspaceView.addView(proxyView)
                 window.addWindowListener(XpraWindowHandler(proxyView))
             }
@@ -177,7 +177,7 @@ class XpraActivity : AppCompatActivity(), XpraEventListener, XpraWindowListener,
     }
 
 
-    inner class XpraWindowHandler(private val proxyView: ProxyWindowView) : XpraWindowListener {
+    inner class XpraWindowHandler(private val proxyView: ProxyView) : XpraWindowListener {
         override fun onMetadataChanged(window: AndroidXpraWindow?) {
         }
 

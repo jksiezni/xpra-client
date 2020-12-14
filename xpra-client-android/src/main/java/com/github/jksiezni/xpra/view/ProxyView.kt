@@ -27,24 +27,24 @@ import timber.log.Timber
 import kotlin.math.max
 
 /**
+ * A proxy view for Xpra windows, dialogs, popups, menus, etc.
+ *
  * Created in code only.
  */
 @SuppressLint("ViewConstructor")
-class ProxyWindowView(context: Context, val window: AndroidXpraWindow) : TextureView(context) {
+class ProxyView(context: Context, val window: AndroidXpraWindow) : TextureView(context) {
 
     init {
         surfaceTextureListener = object : SurfaceTextureListener {
             override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-                Timber.tag("ProxyWindowView(${window.id})").v("onSurfaceTextureAvailable(): $width x $height")
                 window.show(surface, width, height)
             }
 
             override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-                Timber.tag("ProxyWindowView(${window.id})").v("onSurfaceTextureSizeChanged")
+                Timber.v("onSurfaceTextureSizeChanged(): windowId=${window.id}, ${width}x${height}")
             }
 
             override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-                Timber.tag("ProxyWindowView(${window.id})").v("onSurfaceTextureDestroyed")
                 window.hide(surface)
                 return false
             }
@@ -85,12 +85,10 @@ class ProxyWindowView(context: Context, val window: AndroidXpraWindow) : Texture
     inner class TouchHandler : OnTouchListener {
         @SuppressLint("ClickableViewAccessibility")
         override fun onTouch(v: View?, event: MotionEvent): Boolean {
-            Timber.tag("TouchHandler_${window.id}").v("onTouch() evt=%s", event)
             event.offsetLocation(x, y)
             val scale = window.scale
             val x = (max(event.x, 0f) / scale).toInt()
             val y = (max(event.y, 0f) / scale).toInt()
-            Timber.tag("TouchHandler_${window.id}").v("onTouch(): point=%d,%d", x, y)
             when (event.action) {
                 MotionEvent.ACTION_DOWN ->
                     window.mouseAction(1, true, x, y)
