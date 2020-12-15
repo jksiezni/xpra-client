@@ -27,20 +27,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.jksiezni.xpra.R
-import com.github.jksiezni.xpra.client.AndroidXpraWindow
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import xpra.client.XpraWindow
 import java.util.*
 
 /**
  *
  */
-class WindowsAdapter(private val emptyView: TextView) : ListAdapter<XpraWindow, WindowsAdapter.ViewHolder>(DIFF_CALLBACK) {
+class TasksAdapter(private val emptyView: TextView) : ListAdapter<TaskItem, TasksAdapter.ViewHolder>(DIFF_CALLBACK) {
 
-    private val clickPublisher = PublishSubject.create<AndroidXpraWindow>()
+    private val clickPublisher = PublishSubject.create<TaskItem>()
 
-    val onClickAction: Observable<AndroidXpraWindow> = clickPublisher
+    val onClickAction: Observable<TaskItem> = clickPublisher
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -48,13 +46,13 @@ class WindowsAdapter(private val emptyView: TextView) : ListAdapter<XpraWindow, 
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position) as AndroidXpraWindow
+        val item = getItem(position)
         holder.titleView.text = item.title
-        holder.iconView.setImageDrawable(item.iconDrawable)
+        holder.iconView.setImageDrawable(item.icon)
         holder.itemView.setOnClickListener { clickPublisher.onNext(item) }
     }
 
-    override fun onCurrentListChanged(previousList: MutableList<XpraWindow>, currentList: MutableList<XpraWindow>) {
+    override fun onCurrentListChanged(previousList: MutableList<TaskItem>, currentList: MutableList<TaskItem>) {
         if (currentList.isEmpty()) {
             emptyView.visibility = View.VISIBLE
         } else {
@@ -68,15 +66,15 @@ class WindowsAdapter(private val emptyView: TextView) : ListAdapter<XpraWindow, 
     }
 
     companion object {
-        val DIFF_CALLBACK: DiffUtil.ItemCallback<XpraWindow> = object : DiffUtil.ItemCallback<XpraWindow>() {
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<TaskItem> = object : DiffUtil.ItemCallback<TaskItem>() {
             override fun areItemsTheSame(
-                    oldItem: XpraWindow, newItem: XpraWindow): Boolean {
+                    oldItem: TaskItem, newItem: TaskItem): Boolean {
                 // User properties may have changed if reloaded from the DB, but ID is fixed
-                return oldItem.id == newItem.id
+                return oldItem.windowId == newItem.windowId
             }
 
             override fun areContentsTheSame(
-                    oldItem: XpraWindow, newItem: XpraWindow): Boolean {
+                    oldItem: TaskItem, newItem: TaskItem): Boolean {
                 // NOTE: if you use equals, your object must properly override Object#equals()
                 // Incorrectly returning false here will result in too many animations.
                 return Objects.equals(oldItem, newItem)

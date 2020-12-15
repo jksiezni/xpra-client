@@ -24,6 +24,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.github.jksiezni.xpra.client.AndroidXpraWindow
 import com.github.jksiezni.xpra.client.ConnectionEventListener
 import com.github.jksiezni.xpra.view.Intents
 import com.github.jksiezni.xpra.client.ServiceBinderFragment
@@ -80,24 +81,31 @@ class ActiveConnectionFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = ActiveConnectionFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val adapter = TasksAdapter(binding.emptyView)
+        adapter.onClickAction.subscribe { item ->
+            val intent = Intents.createXpraIntent(requireContext(), item.windowId)
+            startActivity(intent)
+        }.addTo(disposables)
+        binding.windowsRecyclerView.adapter = adapter
+
         service.whenXpraAvailable { api ->
-            val adapter = WindowsAdapter(binding.emptyView)
-            binding.windowsRecyclerView.adapter = adapter
-
-            api.xpraClient.getWindowsLiveData().observe(viewLifecycleOwner) {
-                adapter.submitList(it.toList())
+            api.xpraClient.getWindowsLiveData().observe(viewLifecycleOwner) { windows ->
+                val items = windows.map {
+                    val androidWindow = it as AndroidXpraWindow
+                    TaskItem(it.id, it.title, androidWindow.iconDrawable)
+                }
+                adapter.submitList(items)
             }
+        }
 
-            adapter.onClickAction.subscribe { window ->
-                val intent = Intents.createXpraIntent(requireContext(), window.id)
-                startActivity(intent)
-            }.addTo(disposables)
+        binding.createCommandBtn.setOnClickListener {
+            StartCommandDialogFragment().showNow(childFragmentManager, StartCommandDialogFragment.TAG)
         }
     }
 

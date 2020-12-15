@@ -139,7 +139,6 @@ public class AndroidXpraWindow extends XpraWindow {
 
     @Nullable
     public Drawable getIconDrawable() {
-        Timber.v("getIconDrawable %s", icon);
         if (icon == null) {
             return null;
         }
@@ -200,7 +199,6 @@ public class AndroidXpraWindow extends XpraWindow {
     protected void fireOnIconChanged() {
         uiHandler.post(() -> {
             synchronized (listeners) {
-                Timber.v("fireOnIconChanged");
                 for (XpraWindowListener l : listeners) {
                     l.onIconChanged(AndroidXpraWindow.this);
                 }

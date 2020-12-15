@@ -42,5 +42,8 @@
     <string name="keyboard">keyboard</string>
     <string name="already_connected">A single connection is supported now.</string>
     <string name="no_tasks_label">No active tasks</string>
+    <string name="start_command">Start command</string>
+    <string name="cancel">Cancel</string>
+    <string name="hint_start_cmd">ex. xterm</string>
 
 </resources>
