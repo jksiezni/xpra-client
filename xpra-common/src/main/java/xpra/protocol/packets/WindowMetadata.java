@@ -140,7 +140,7 @@ public class WindowMetadata extends WindowPacket {
     @Nullable
     public SizeConstraints getSizeConstraints() {
         Map<String, Object> map = asMap(meta.get(META_SIZE_CONSTRAINTS));
-        if (map != null) {
+        if (map != null && map.containsKey("minimum-size") && map.containsKey("gravity")) {
             List<Number> minimumSize = asList(map.get("minimum-size"));
             return new SizeConstraints(asInt(map.get("gravity")), minimumSize.get(0).intValue(), minimumSize.get(1).intValue());
         }
